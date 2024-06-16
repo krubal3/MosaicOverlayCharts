@@ -161,12 +161,14 @@ function drawLine(fromR, fromC, toR, toC) {
 
 function placePoint(r, c) {
   let td = document.getElementById("_" + r + "_" + c);
-  td.style.backgroundColor = colorB;
-  if (r % 2 !== 0) {
-    td = document.getElementById("_" + (r-1) + "_" + c);
+  if (td !== null) {
     td.style.backgroundColor = colorB;
-    td = document.getElementById("_" + (r+1) + "_" + c);
-    td.style.backgroundColor = colorB;
+    if (r % 2 !== 0) {
+      td = document.getElementById("_" + (r-1) + "_" + c);
+      td.style.backgroundColor = colorB;
+      td = document.getElementById("_" + (r+1) + "_" + c);
+      td.style.backgroundColor = colorB;
+    }
   }
 }
 
@@ -176,7 +178,7 @@ function drawCircle(fromR, fromC, toR, toC) {
   let centerR = Math.round(height / 2) + fromR;
   let centerC = Math.round(width / 2) + fromC;
   if (pattern.chartType == "S") {
-    height = height * 1.33
+    height = height * 1.33;
   }
   let radius = Math.round(width/2);
   if (width > height) {
@@ -193,12 +195,16 @@ function drawCircle(fromR, fromC, toR, toC) {
     placePoint(centerR - r, centerC + c);
     placePoint(centerR + r, centerC - c);
   }
-  let radiusInR = Math.round(radius * 0.75);
+  let radiusInR = radius;
+  if (pattern.chartType == "S") {
+    radiusInR = Math.round(radius * 0.75);
+  }
   for (r = 0; r <= radiusInR; r++) {
-    let c = Math.sqrt((radius * radius) - (r * r));
+    let currR = r;
     if (pattern.chartType == "S") {
-      c = 1.33 * c;
+      currR = r * 1.33;
     }
+    let c = Math.sqrt((radius * radius) - (currR * currR));
     c = Math.round(c);
     placePoint(centerR + r, centerC + c);
     placePoint(centerR - r, centerC - c);
