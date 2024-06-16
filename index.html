@@ -25,6 +25,8 @@
     <option value="S">select</option>
     <option value="F">fill</option>
   </select>
+  <button id="btnUndo" onclick="undo();">undo</button>
+  <button id="btnClearChart" onclick="clearChart();">clear</button>
   <br />
   <b>Import Image:</b>
   <input id="fleImage" type="file" />
@@ -70,8 +72,8 @@
   <canvas id="cnvReverse" width="31" height="31"></canvas>
   <canvas id="cnvStripe" width="31" height="31"></canvas>
   <br />
+  <b>Instructions:</b> 
   <button id="btnImportInstructions" onclick="importInstructions();">import</button>
-  <button id="btnClearChart" onclick="clearChart();">clear</button>
   <br />
   <textarea id="txtInstructions" cols="80" rows="30"></textarea>
   <br />

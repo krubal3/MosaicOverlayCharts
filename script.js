@@ -891,6 +891,18 @@ function clickCell(td) {
   }  
 }
 
+function undo() {
+  if (localStorage.getItem("patternUndo") !== null) {
+    let patternUndo = JSON.parse(localStorage.getItem("patternUndo"));
+    localStorage.setItem("patternUndo", JSON.stringify(pattern));
+    localStorage.setItem("pattern", JSON.stringify(patternUndo));
+    restorePattern();
+    loadChart();
+    refreshPreview();
+    writeInstructions();
+  }
+}
+
 function savePattern() {
   let cellsColorB = new Array();
   for (r = pattern.gridRows; r > 1; r--) {
@@ -905,6 +917,9 @@ function savePattern() {
     }
   }
   pattern.cellsColorB = cellsColorB;
+  if (localStorage.getItem("pattern") !== null) {
+    localStorage.setItem("patternUndo", localStorage.getItem("pattern"));
+  }
   localStorage.setItem("pattern", JSON.stringify(pattern));
 }
 
