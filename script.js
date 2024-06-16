@@ -386,7 +386,6 @@ function importImage() {
     let imageData = ctx.getImageData(0, 0, cnvPlain.width, cnvPlain.height);
     pattern.gridColumns = cnvPlain.width;
     pattern.gridRows = cnvPlain.height;
-    savePattern();
     loadChart();
 
     for (r = pattern.gridRows - 1; r > -1; r--) {
