@@ -1,0 +1,39 @@
+
+body {
+    font-family: arial;
+    font-size: 10pt;
+}
+
+#divScroll {
+    overflow: scroll;
+    width:100%;
+}
+
+table {
+    table-layout: fixed;
+}
+
+#tblChart {
+    border-collapse: collapse;
+    table-layout: fixed;  
+}
+
+td {
+    border: 1px solid black;
+    text-align: center;
+    z-index: 0;
+    width: 15px;
+    height: 15px;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.stst {
+    width: 15px;
+    height: 20px;
+}
+
+
+  
+  
+

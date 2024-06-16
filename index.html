@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width" />
+  <title>Mosaic Overlay Charts</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <b>Setup Chart:</b> 
+  <select id="selChartType" onchange="changeChartType(this.value);">
+    <option value="G">garter</option>
+    <option value="S">stockinette</option>
+    <option value="CR">crochet (RS only)</option>
+    <option value="C">crochet (back and forth)</option>
+  </select>
+  grid columns: 
+  <input id="txtGridColumns" type="number" value="31" min="1" max="999" size="3" onchange="changeGridColumns(this.value);" />
+  grid rows: 
+  <input id="txtGridRows" type="number" value="31" min="1" max="999" size="3" onchange="changeGridRows(this.value);" />
+  <button>ok</button>
+  mode:
+  <select id="selMode" onchange="changeMode(this.value);">
+    <option value="T">toggle</option>
+    <option value="S">select</option>
+    <option value="F">fill</option>
+  </select>
+  <br />
+  <b>Import Image:</b>
+  <input id="fleImage" type="file" />
+  fit to:
+  <input id="txtFitNumber" type="number" value="31" min="1" max="999" size="3" />
+  <select id="selFitType">
+    <option value="C">columns</option>
+    <option value="R">rows</option>
+  </select>
+  <button id="btnImportImage" onclick="importImage();">import</button>
+  <div id="divSelectionMenu" style="display: none; background-color: white; position: absolute; top: 200px; left: 200px; ">
+    <select id="selShape" onchange="selectShape(this);">
+      <option value="">-- shape --</option>
+      <option value="|">line |</option>
+      <option value="_">line _</option>
+      <option value="/">line /</option>
+      <option value="\">line \</option>
+      <option value="R">rectangle</option>
+      <option value="C">circle</option>
+    </select>
+    <br />
+    <select id="selCutCopy" onchange="selectCutCopy(this);" >
+      <option value="">-- cut/copy --</option>
+      <option value="cut">cut</option>
+      <option value="copy">copy</option>
+      <option value="cancel">cancel</option>
+    </select>
+    <br/>
+    <select id="selPaste" onchange="selectPaste(this);" style="display: none;">
+      <option value="">-- paste --</option>
+      <option value="leftTop">paste left top</option>
+      <option value="center">paste center</option>
+      <option value="fill">paste fill</option>
+      <option value="flipH">flip horizontal</option>
+      <option value="flipV">flip vertical</option>
+    </select>
+  </div>
+  <div id="divScroll">
+    <table id="tblChart"></table>
+  </div>
+  <br/>
+  <canvas id="cnvPlain" width="31" height="31"></canvas>
+  <canvas id="cnvReverse" width="31" height="31"></canvas>
+  <canvas id="cnvStripe" width="31" height="31"></canvas>
+  <br />
+  <button id="btnImportInstructions" onclick="importInstructions();">import</button>
+  <button id="btnClearChart" onclick="clearChart();">clear</button>
+  <br />
+  <textarea id="txtInstructions" cols="80" rows="30"></textarea>
+  <br />
+  <img id="imgImport" style="display: none;" />
+  <script src="script.js"></script>
+</body>
+</html>
