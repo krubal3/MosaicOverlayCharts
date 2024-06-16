@@ -828,7 +828,7 @@ function fill(td) {
   if (td.style.backgroundColor == colorB) {
     fillColor = colorA;
   }
-  let minR = parseInt(cellId.column, 10);
+  let minR = parseInt(cellId.row, 10);
   while (minR > 2) {
     let checkCell = document.getElementById("_" + (minR - 1) + "_" + cellId.column);
     if (fillColor == colorA) {
@@ -839,7 +839,7 @@ function fill(td) {
     }
     minR = minR - 1;
   }
-  let maxR = parseInt(cellId.column, 10);
+  let maxR = parseInt(cellId.row, 10);
   while (maxR <= pattern.gridRows - 2) {
     let checkCell = document.getElementById("_" + (maxR + 1) + "_" + cellId.column);
     if (fillColor == colorA) {
