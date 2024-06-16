@@ -423,6 +423,8 @@ function importImage() {
     }
     addXs();
     savePattern();
+    restorePattern();
+    loadChart();
     refreshPreview();
     writeInstructions();
   }
