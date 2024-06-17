@@ -439,56 +439,61 @@ function splitId(id) {
 }
 
 function importInstructions() {
-  let instructions = document.getElementById("txtInstructions").value;
-  let iTimes = instructions.indexOf("times");
-  while (iTimes > -1) {
-    let tempText = instructions.substring(0, iTimes + "times".length);
-    let iBegParen = tempText.lastIndexOf("(");
-    let iEndParen = tempText.lastIndexOf(")");
-    let rptText = tempText.substring(iBegParen + 1, iEndParen);
-    let rptTimes = parseInt(tempText.substring(iEndParen + 1, iTimes), 10);
-    let oldText = tempText.substring(iBegParen);
-    let newText = "";
-    for (x = 1; x <= rptTimes; x++) {
-      newText = newText + rptText;
-      if (x < rptTimes) {
-        newText = newText + ",";
+  if (confirm("Previous design will be cleared.  Okay to continue?")) {
+    let instructions = document.getElementById("txtInstructions").value;
+    let iTimes = instructions.indexOf("times");
+    while (iTimes > -1) {
+      let tempText = instructions.substring(0, iTimes + "times".length);
+      let iBegParen = tempText.lastIndexOf("(");
+      let iEndParen = tempText.lastIndexOf(")");
+      let rptText = tempText.substring(iBegParen + 1, iEndParen);
+      let rptTimes = parseInt(tempText.substring(iEndParen + 1, iTimes), 10);
+      let oldText = tempText.substring(iBegParen);
+      let newText = "";
+      for (x = 1; x <= rptTimes; x++) {
+        newText = newText + rptText;
+        if (x < rptTimes) {
+          newText = newText + ",";
+        }
+      }
+      instructions = instructions.replace(oldText, newText);
+      iTimes = instructions.indexOf("times");
+    }
+    let arrRow = instructions.split("row ");
+    pattern.gridRows = arrRow.length - 1;
+    pattern.gridColumns = parseInt(arrRow[1].split(":")[1].trim(), 10);
+    loadChart();
+    for (r = 1; r <= pattern.gridRows; r++) {
+      for (c = 1; c <= pattern.gridColumns; c++) {
+        let td = document.getElementById("_" + r + "_" + c);
+        td.style.backgroundColor = colorA;
+        if (r % 2 == 0) {
+          td.style.backgroundColor = colorB;
+        }
       }
     }
-    instructions = instructions.replace(oldText, newText);
-    iTimes = instructions.indexOf("times");
-  }
-  let arrRow = instructions.split("row ");
-  pattern.gridRows = arrRow.length - 1;
-  pattern.gridColumns = parseInt(arrRow[1].split(":")[1].trim(), 10);
-  loadChart();
-  for (r = 1; r <= pattern.gridRows; r++) {
-    for (c = 1; c <= pattern.gridColumns; c++) {
-      let td = document.getElementById("_" + r + "_" + c);
-      td.style.backgroundColor = colorA;
-      if (r % 2 == 0) {
-        td.style.backgroundColor = colorB;
+    for (r = 1; r <= pattern.gridRows; r++) {
+     let arrSts = arrRow[r].split(":")[1].split(",");
+     let currCol = 1;
+     for (s = 0; s < arrSts.length; s++) {
+      let numSts = parseInt(arrSts[s], 10);
+      if (arrSts[s].indexOf(overlay) > -1) {
+        for (c = currCol; c < currCol + numSts; c++) {
+          let td = document.getElementById("_" + (r-1) + "_" + c);
+          td.style.backgroundColor = colorA;
+          if (r % 2 == 0) {
+            td.style.backgroundColor = colorB;
+          }
+        }
       }
+      currCol = currCol + numSts;
+     } 
     }
+    addXs();
+    savePattern();
+    refreshPreview();
+    writeInstructions();
   }
-  for (r = 1; r <= pattern.gridRows; r++) {
-   let arrSts = arrRow[r].split(":")[1].split(",");
-   let currCol = 1;
-   for (s = 0; s < arrSts.length; s++) {
-    let numSts = parseInt(arrSts[s], 10);
-    if (arrSts[s].indexOf(overlay) > -1) {
-      for (c = currCol; c < currCol + numSts; c++) {
-        let td = document.getElementById("_" + (r-1) + "_" + c);
-        td.style.backgroundColor = colorB;
-      }
-    }
-    currCol = currCol + numSts;
-   } 
-  }
-  addXs();
-  savePattern();
-  refreshPreview();
-  writeInstructions();
 }
 
 function refreshPreview() {
