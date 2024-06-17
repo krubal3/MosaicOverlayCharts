@@ -827,6 +827,22 @@ function fillRow(cellId, fillColor) {
   }
 }
 
+function noStitchCell(td) {
+  let cellId = splitId(td.id);
+  let nextTd = document.getElementById("_" + cellId.row + "_" + (cellId.column + 1));
+  let prevTd = document.getElementById("_" + cellId.row + "_" + (cellId.column - 1));
+  if (td.classList.contains("noStitch")) { 
+    if ((nextTd !== null && !nextTd.classList.contains("noStitch")) || (prevTd !== null && !prevTd.classList.contains("noStitch"))) {
+      td.classList.remove("noStitch");
+    }   
+  }
+  else {
+    if ((nextTd == null || nextTd.classList.contains("noStitch")) || (prevTd == null || prevTd.classList.contains("noStitch"))) {
+      td.classList.add("noStitch");
+    }
+  }
+}
+
 function fill(td) {
   let cellId = splitId(td.id);
   let fillColor = colorB;
@@ -893,6 +909,9 @@ function clickCell(td) {
       break;
     case "F":
       fill(td);
+      break;
+    case "N":
+      noStitchCell(td);
       break;
   }  
 }

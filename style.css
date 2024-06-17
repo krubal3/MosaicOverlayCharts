@@ -28,6 +28,10 @@ td {
     white-space: nowrap;
 }
 
+.noStitch {
+    border-style: none;
+}
+
 .stst {
     width: 15px;
     height: 20px;
