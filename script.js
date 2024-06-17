@@ -710,7 +710,6 @@ function addXs() {
       let tdBelow = document.getElementById("_" + rBelow + "_" + c);
       let color = td.style.backgroundColor;
       let colorBelow = tdBelow.style.backgroundColor;
-      
       if (r % 2 == 0) {
         if (color == colorB && colorBelow == colorB) {
           td.innerHTML = overlay;
@@ -827,22 +826,6 @@ function fillRow(cellId, fillColor) {
   }
 }
 
-function noStitchCell(td) {
-  let cellId = splitId(td.id);
-  let nextTd = document.getElementById("_" + cellId.row + "_" + (cellId.column + 1));
-  let prevTd = document.getElementById("_" + cellId.row + "_" + (cellId.column - 1));
-  if (td.classList.contains("noStitch")) { 
-    if ((nextTd !== null && !nextTd.classList.contains("noStitch")) || (prevTd !== null && !prevTd.classList.contains("noStitch"))) {
-      td.classList.remove("noStitch");
-    }   
-  }
-  else {
-    if ((nextTd == null || nextTd.classList.contains("noStitch")) || (prevTd == null || prevTd.classList.contains("noStitch"))) {
-      td.classList.add("noStitch");
-    }
-  }
-}
-
 function fill(td) {
   let cellId = splitId(td.id);
   let fillColor = colorB;
@@ -910,9 +893,6 @@ function clickCell(td) {
     case "F":
       fill(td);
       break;
-    case "N":
-      noStitchCell(td);
-      break;
   }  
 }
 
@@ -942,7 +922,7 @@ function savePattern() {
     }
   }
   pattern.cellsColorB = cellsColorB;
-  if (localStorage.getItem("pattern") !== null) {
+  if (localStorage.getItem("pattern") !== null && localStorage.getItem("pattern") !== JSON.stringify(pattern)) {
     localStorage.setItem("patternUndo", localStorage.getItem("pattern"));
   }
   localStorage.setItem("pattern", JSON.stringify(pattern));
