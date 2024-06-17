@@ -14,7 +14,6 @@ var selection = {
   cells: [],
   action: ""
 };
-var mode = "D";
 var plain = "";
 var overlay = "X";
 
@@ -57,8 +56,7 @@ function changeGridRows(gridRows) {
   writeInstructions();
 }
 
-function changeMode(newMode) {
-  mode = newMode;
+function changeMode() {
   for (r = pattern.gridRows; r > 1; r--) {
     for (c = pattern.gridColumns-1; c > 1; c--) {
       let gridTd = document.getElementById("_" + r + "_" + c);
@@ -885,6 +883,7 @@ function fill(td) {
 }
 
 function clickCell(td) {
+  let mode = document.getElementById("selMode").value;
   switch (mode) {
     case "T":
       toggleCell(td);
