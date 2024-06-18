@@ -157,15 +157,15 @@ function drawLine(fromR, fromC, toR, toC) {
   }
 }
 
-function placePoint(r, c) {
+function placePoint(r, c, setColor = colorB) {
   let td = document.getElementById("_" + r + "_" + c);
   if (td !== null) {
-    td.style.backgroundColor = colorB;
-    if (r % 2 !== 0) {
+    td.style.backgroundColor = setColor;
+    if ((setColor == colorA && r % 2 == 0) || (setColor == colorB && r % 2 !== 0)) {
       td = document.getElementById("_" + (r-1) + "_" + c);
-      td.style.backgroundColor = colorB;
+      td.style.backgroundColor = setColor;
       td = document.getElementById("_" + (r+1) + "_" + c);
-      td.style.backgroundColor = colorB;
+      td.style.backgroundColor = setColor;
     }
   }
 }
@@ -398,24 +398,7 @@ function importImage() {
         if (trans > 0 && avg < 200) {
           let currR = pattern.gridRows - r;
           let currC = pattern.gridColumns - c;
-          let td = document.getElementById("_" + currR + "_" + currC);
-          if (td) {
-            if (td.style.backgroundColor != colorB) {
-              td.style.backgroundColor = colorB;
-              if (currR % 2 == 1) {
-                currR = currR - 1;
-                td = document.getElementById("_" + currR + "_" + currC);
-                if (td) {
-                  td.style.backgroundColor = colorB;
-                }
-                currR = currR + 2;
-                td = document.getElementById("_" + currR + "_" + currC);
-                if (td) {
-                  td.style.backgroundColor = colorB;
-                }
-              }
-            }
-          }
+          placePoint(currR, currC);
         }
       }
     }
@@ -739,26 +722,12 @@ function toggleCell(td) {
   let id = splitId(td.id);
   let r = id.row;
   let c = id.column;
-
-  let rAbove = parseInt(r,10) + 1;
-  let rBelow = parseInt(r,10) - 1;
-  let tdAbove = document.getElementById("_" + rAbove + "_" + c);
-  let tdBelow = document.getElementById("_" + rBelow + "_" + c);
-
   if (r > 1 && r < pattern.gridRows && c > 1 && c < pattern.gridColumns) {
     if (td.style.backgroundColor == colorB) {
-      td.style.backgroundColor = colorA;
-      if (r % 2 == 0) {
-        tdAbove.style.backgroundColor = colorA;
-        tdBelow.style.backgroundColor = colorA;
-      }
+      placePoint(r, c, colorA);
     }
     else  {
-      td.style.backgroundColor = colorB;
-      if (r % 2 == 1) {
-        tdAbove.style.backgroundColor = colorB;
-        tdBelow.style.backgroundColor = colorB;
-      }
+      placePoint(r, c, colorB);
     }
   }
   addXs();
