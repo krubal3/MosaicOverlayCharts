@@ -933,7 +933,11 @@ function loadChart() {
 
   for (c = pattern.gridColumns; c > 0; c--) {
     td = document.createElement("td");
-    text = document.createTextNode(c);
+    let colNum = c;
+    if (pattern.chartType == "C") {
+      colNum = parseInt(pattern.gridColumns, 10) - colNum + 1;
+    }
+    text = document.createTextNode(colNum);
     td.appendChild(text);
     row.appendChild(td);
   }
