@@ -17,6 +17,11 @@ var selection = {
 var plain = "";
 var overlay = "X";
 
+function getCell(row, column) {
+  let td = document.getElementById("_" + row + "_" + column);
+  return td;
+}
+
 function changeChartType(chartType) {
   pattern.chartType = chartType;
   savePattern();
@@ -29,7 +34,7 @@ function changeGridColumns(gridColumns) {
   gridColumns = parseInt(gridColumns, 10);
   if (gridColumns > 0 && gridColumns <= maxGridColumns) {
     for (r = 1; r <= pattern.gridRows; r++) {
-      let td = document.getElementById("_" + r + "_" + pattern.gridColumns);
+      let td = getCell(r, pattern.gridColumns);
       td.style.backgroundColor = colorA;
     }
     pattern.gridColumns = gridColumns;
@@ -59,7 +64,7 @@ function changeGridRows(gridRows) {
 function changeMode() {
   for (r = pattern.gridRows; r > 1; r--) {
     for (c = pattern.gridColumns-1; c > 1; c--) {
-      let gridTd = document.getElementById("_" + r + "_" + c);
+      let gridTd = getCell(r, c);
       gridTd.style.borderColor = "";
     }
   } 
@@ -87,13 +92,20 @@ function getIdRange(fromId, toId) {
   if (minR % 2 !== 0) {
     minR = minR - 1;
   }
-
+  if (minR < 1) {
+    minR = 1;
+  }
+  
   let maxC = toIds.column;
   let minC = fromIds.column;
   if (parseInt(maxC, 10) < parseInt(minC, 10)) { 
     maxC = fromIds.column;
     minC = toIds.column;
   }
+  if (minC < 1) {
+    minC = 1;
+  }
+
   return {
     minR: minR,
     maxR: maxR,
@@ -106,7 +118,7 @@ function clearSelection() {
   let idRange = getIdRange(selection.fromId, selection.toId);
   for (r = idRange.minR; r <= idRange.maxR; r++) {
     for (c = idRange.minC; c <= idRange.maxC; c++) {
-      let td = document.getElementById("_" + r + "_" + c);
+      let td = getCell(r, c);
       td.style.borderColor = "";
     }
   }
@@ -158,14 +170,18 @@ function drawLine(fromR, fromC, toR, toC) {
 }
 
 function placePoint(r, c, setColor = colorB) {
-  let td = document.getElementById("_" + r + "_" + c);
+  let td = getCell(r, c);
   if (td !== null) {
     td.style.backgroundColor = setColor;
     if ((setColor == colorA && r % 2 == 0) || (setColor == colorB && r % 2 !== 0)) {
-      td = document.getElementById("_" + (r-1) + "_" + c);
-      td.style.backgroundColor = setColor;
-      td = document.getElementById("_" + (r+1) + "_" + c);
-      td.style.backgroundColor = setColor;
+      td = getCell(r - 1, c);
+      if (td !== null) {
+        td.style.backgroundColor = setColor;
+      }
+      td = getCell(r + 1, c);
+      if (td !== null) {
+        td.style.backgroundColor = setColor;
+      }
     }
   }
 }
@@ -252,7 +268,7 @@ function selectCutCopy(selCutCopy) {
   let arrCells = new Array();
   for (r = pattern.gridRows; r > 1; r--) {
     for (c = pattern.gridColumns-1; c > 1; c--) {
-      let gridTd = document.getElementById("_" + r + "_" + c);
+      let gridTd = getCell(r, c);
       gridTd.style.borderColor = "";
       if (selCutCopy.value !== "cancel" && r >= idRange.minR && r <= idRange.maxR && c >= idRange.minC && c <= idRange.maxC) {
         let cell = {
@@ -322,7 +338,7 @@ function selectPaste(selPaste) {
         }
         let color = selection.cells[i].color;
         if (r > 1 && r < pattern.gridRows && c > 1 && c < pattern.gridColumns) {
-          let td = document.getElementById("_" + r + "_" + c);
+          let td = getCell(r, c);
           if (selPaste.value == "fill") {
             if (r >= idRange.minR && r <= idRange.maxR && c >= idRange.minC && c <= idRange.maxC) {
               td.style.backgroundColor = color;
@@ -338,7 +354,7 @@ function selectPaste(selPaste) {
   
   for (r = pattern.gridRows; r > 1; r--) {
     for (c = pattern.gridColumns-1; c > 1; c--) {
-      let gridTd = document.getElementById("_" + r + "_" + c);
+      let gridTd = getCell(r, c);
       gridTd.style.borderColor = "";
     }
   } 
@@ -448,7 +464,7 @@ function importInstructions() {
     loadChart();
     for (r = 1; r <= pattern.gridRows; r++) {
       for (c = 1; c <= pattern.gridColumns; c++) {
-        let td = document.getElementById("_" + r + "_" + c);
+        let td = getCell(r, c);
         td.style.backgroundColor = colorA;
         if (r % 2 == 0) {
           td.style.backgroundColor = colorB;
@@ -462,7 +478,7 @@ function importInstructions() {
       let numSts = parseInt(arrSts[s], 10);
       if (arrSts[s].indexOf(overlay) > -1) {
         for (c = currCol; c < currCol + numSts; c++) {
-          let td = document.getElementById("_" + (r-1) + "_" + c);
+          let td = getCell(r - 1, c);
           td.style.backgroundColor = colorA;
           if (r % 2 == 0) {
             td.style.backgroundColor = colorB;
@@ -523,7 +539,7 @@ function refreshPreview() {
   for (r = pattern.gridRows; r > 0; r--) {
     let y = (parseInt(pattern.gridRows, 10) - r) * hscale;
     for (c = pattern.gridColumns; c > 0; c--) {
-      let td = document.getElementById("_" + r + "_" + c);
+      let td = getCell(r, c);
       let x = (parseInt(pattern.gridColumns, 10) - c) * wscale;
       
       if (td.style.backgroundColor == colorB) {
@@ -580,7 +596,7 @@ function writeInstructions() {
     let arrSts = new Array();
     for (c = 1; c <= pattern.gridColumns; c++) {
       let txt = plain;
-      let td = document.getElementById("_" + r + "_" + c);
+      let td = getCell(r, c);
       if (td.innerHTML == overlay) {
         txt = overlay;
       }
@@ -677,7 +693,7 @@ function clearChart() {
   if (confirm("Previous design will be cleared.  Okay to continue?")) {
     for (r = pattern.gridRows; r > 0; r--) {
       for (c = pattern.gridColumns; c > 0; c--) {
-        let td = document.getElementById("_" + r + "_" + c);
+        let td = getCell(r, c);
         td.style.backgroundColor = colorA;
       }
     }
@@ -693,9 +709,9 @@ function clearChart() {
 function addXs() {
   for (r = pattern.gridRows; r > 1; r--) {
     for (c = pattern.gridColumns-1; c > 1; c--) {
-      let td = document.getElementById("_" + r + "_" + c);
+      let td = getCell(r, c);
       let rBelow = parseInt(r,10) - 1;
-      let tdBelow = document.getElementById("_" + rBelow + "_" + c);
+      let tdBelow = getCell(rBelow, c);
       let color = td.style.backgroundColor;
       let colorBelow = tdBelow.style.backgroundColor;
       if (r % 2 == 0) {
@@ -747,7 +763,7 @@ function selectCell(td) {
     
     for (r = pattern.gridRows; r > 1; r--) {
       for (c = pattern.gridColumns-1; c > 1; c--) {
-        let gridTd = document.getElementById("_" + r + "_" + c);
+        let gridTd = getCell(r, c);
         gridTd.style.borderColor = "";
         if (r >= idRange.minR && r <= idRange.maxR && c >= idRange.minC && c <= idRange.maxC) {
           gridTd.style.borderColor = "red";
@@ -770,9 +786,9 @@ function selectCell(td) {
 function fillRow(cellId, fillColor) {
   let minC = parseInt(cellId.column, 10);
   while (minC > 2) {
-    let checkCell = document.getElementById("_" + cellId.row + "_" + (minC - 1));
+    let checkCell = getCell(cellId.row, minC - 1);
     if (fillColor == colorA) {
-      checkCell = document.getElementById("_" + cellId.row + "_" + (minC - 2));
+      checkCell = getCell(cellId.row, minC - 2);
     }
     if (checkCell.style.backgroundColor == fillColor) {
       break;
@@ -781,9 +797,9 @@ function fillRow(cellId, fillColor) {
   }
   let maxC = parseInt(cellId.column, 10);
   while (maxC < pattern.gridColumns - 2) {
-    let checkCell = document.getElementById("_" + cellId.row + "_" + (maxC + 1));
+    let checkCell = getCell(cellId.row, maxC + 1);
     if (fillColor == colorA) {
-      checkCell = document.getElementById("_" + cellId.row + "_" + (maxC + 2));
+      checkCell = getCell(cellId.row, maxC + 2);
     }
     if (checkCell.style.backgroundColor == fillColor) {
       break;
@@ -791,7 +807,7 @@ function fillRow(cellId, fillColor) {
     maxC = maxC + 1;
   }
   for (c = minC; c <= maxC; c++) {
-    let fillCell = document.getElementById("_" + cellId.row + "_" + c);
+    let fillCell = getCell(cellId.row, c);
     fillCell.style.backgroundColor = fillColor;
   }
   return {
@@ -808,22 +824,22 @@ function fill(td) {
   }
   let minR = parseInt(cellId.row, 10);
   while (minR > 2) {
-    let checkCell = document.getElementById("_" + (minR - 1) + "_" + cellId.column);
+    let checkCell = getCell(minR - 1, cellId.column);
     if (fillColor == colorA) {
-      checkCell = document.getElementById("_" + (minR - 2) + "_" + cellId.column);
+      checkCell = getCell(minR - 2, cellId.column);
     }
-    if (checkCell.style.backgroundColor == fillColor) {
+    if (checkCell == null || checkCell.style.backgroundColor == fillColor) {
       break;
     }
     minR = minR - 1;
   }
   let maxR = parseInt(cellId.row, 10);
   while (maxR <= pattern.gridRows - 2) {
-    let checkCell = document.getElementById("_" + (maxR + 1) + "_" + cellId.column);
+    let checkCell = getCell(maxR  + 1, cellId.column);
     if (fillColor == colorA) {
-      checkCell = document.getElementById("_" + (maxR + 2) + "_" + cellId.column);
+      checkCell = getCell(maxR  + 2, cellId.column);
     }
-    if (checkCell.style.backgroundColor == fillColor) {
+    if (checkCell == null || checkCell.style.backgroundColor == fillColor) {
       break;
     }
     maxR = maxR + 1;
@@ -886,7 +902,7 @@ function savePattern() {
   let cellsColorB = new Array();
   for (r = pattern.gridRows; r > 1; r--) {
     for (c = pattern.gridColumns-1; c > 1; c--) {
-      let td = document.getElementById("_" + r + "_" + c);
+      let td = getCell(r, c);
       if (td !== null) {
         let tdColor = td.style.backgroundColor;
         if (tdColor == colorB) {
