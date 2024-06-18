@@ -62,12 +62,7 @@ function changeGridRows(gridRows) {
 }
 
 function changeMode() {
-  for (r = pattern.gridRows; r > 1; r--) {
-    for (c = pattern.gridColumns-1; c > 1; c--) {
-      let gridTd = getCell(r, c);
-      gridTd.style.borderColor = "";
-    }
-  } 
+  clearSelection();
   selection.fromId = "";
   selection.toId = "";
   selection.cells = [];
@@ -114,7 +109,7 @@ function getIdRange(fromId, toId) {
   }
 }
 
-function clearSelection() {
+function hideSelection() {
   let idRange = getIdRange(selection.fromId, selection.toId);
   for (r = idRange.minR; r <= idRange.maxR; r++) {
     for (c = idRange.minC; c <= idRange.maxC; c++) {
@@ -122,6 +117,10 @@ function clearSelection() {
       td.style.borderColor = "";
     }
   }
+}
+
+function clearSelection() {
+  hideSelection();
   selection.fromId = "";
   selection.toId = "";
   selection.cells = [];
@@ -352,12 +351,7 @@ function selectPaste(selPaste) {
     }
   }
   
-  for (r = pattern.gridRows; r > 1; r--) {
-    for (c = pattern.gridColumns-1; c > 1; c--) {
-      let gridTd = getCell(r, c);
-      gridTd.style.borderColor = "";
-    }
-  } 
+  hideSelection();
   selection.fromId = "";
   selection.toId = "";
   selPaste.value = "";
