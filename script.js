@@ -563,7 +563,7 @@ function workRows(arrRow, arrRowStarts, arrGrid) {
     for (i = 1; i < startColumn; i++) {
       addCellToGrid(r, i, colorNoStitch, arrGrid);
     }
-    alert(arrRow[r]);
+    //alert(arrRow[r]);
     let rowText = arrRow[r].split(":")[1];
     let arrStitchText = rowText.split(",");
     if (arrRow[r].indexOf("WS") > -1) {
@@ -615,7 +615,7 @@ function workRows(arrRow, arrRowStarts, arrGrid) {
       currColumn = currColumn + 1;
       cellBelow = arrGrid.find((cell) => cell.row == r - 1 && cell.column == currColumn);
     }
-    alert(JSON.stringify(arrGrid.filter((cell) => cell.row == r)));
+    //alert(JSON.stringify(arrGrid.filter((cell) => cell.row == r)));
   }
 }
 
