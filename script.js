@@ -582,11 +582,14 @@ function workRows(arrRow, arrRowStarts, arrGrid) {
           cellBelow = arrGrid.find((cell) => cell.row == r - 1 && cell.column == currColumn);
         }
         for (i = 0; i < stitchInstructions.stitchNumber; i++) {
-          let stColor = rowColor;
           if (stitchInstructions.stitchType == decrease) {
-            stColor = colorNoStitch;
+            if (s > 0) {
+              addCellToGrid(r, currColumn + i, colorNoStitch, arrGrid);
+            }
           }
-          addCellToGrid(r, currColumn + i, stColor, arrGrid);
+          else {
+            addCellToGrid(r, currColumn + i, rowColor, arrGrid);
+          }
           if (stitchInstructions.stitchType == overlay) {
             cellBelow = arrGrid.find((cell) => cell.row == r - 1 && cell.column == currColumn + i);
             if (cellBelow !== undefined && cellBelow.color !== colorNoStitch) {
@@ -595,7 +598,15 @@ function workRows(arrRow, arrRowStarts, arrGrid) {
           }
         }
       }
-      currColumn = currColumn + stitchInstructions.stitchNumber;
+      if (stitchInstructions.stitchType !== decrease || s > 0) {
+        currColumn = currColumn + stitchInstructions.stitchNumber;
+      }
+    }
+    let cellBelow = arrGrid.find((cell) => cell.row == r - 1 && cell.column == currColumn);
+    while (cellBelow !== undefined && cellBelow.color == colorNoStitch) {
+      addCellToGrid(r, currColumn, colorNoStitch, arrGrid);
+      currColumn = currColumn + 1;
+      cellBelow = arrGrid.find((cell) => cell.row == r - 1 && cell.column == currColumn);
     }
   }
 }
@@ -624,6 +635,8 @@ function importInstructions() {
     }
     addXs();
     savePattern();
+    restorePattern();
+    loadChart();
     refreshPreview();
     writeInstructions();
     alert("Imported");
@@ -884,25 +897,30 @@ function addXs() {
     let edgeColumns = getEdgeColumns(r);
     for (c = pattern.gridColumns; c >= 1; c--) {
       let td = getCell(r, c);
+      td.innerHTML = plain;
       let rBelow = parseInt(r, 10) - 1;
       let tdBelow = getCell(rBelow, c);
       let color = td.style.backgroundColor;
       let colorBelow = tdBelow.style.backgroundColor;
-      td.innerHTML = plain;
       if (c == edgeColumns.first || c == edgeColumns.last) {
         if (r % 2 == 0) {
           td.style.backgroundColor = colorB;
         }
+        else {
+          td.style.backgroundColor = colorA;
+        }
       }
       else {
-        if (r % 2 == 0) {
-          if (color == colorB && colorBelow == colorB) {
-            td.innerHTML = overlay;
+        if (c > edgeColumns.first && c < edgeColumns.last) {
+          if (r % 2 == 0) {
+            if (color == colorB && colorBelow == colorB) {
+              td.innerHTML = overlay;
+            }
           }
-        }
-        else {
-          if (color == colorA && colorBelow == colorA) {
-            td.innerHTML = overlay;
+          else {
+            if (color == colorA && colorBelow == colorA) {
+              td.innerHTML = overlay;
+            }
           }
         }
       }
