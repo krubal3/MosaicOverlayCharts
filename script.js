@@ -440,6 +440,9 @@ function splitId(id) {
 }
 
 function addCellToGrid(row, column, color, arrGrid) {
+  // if (arrGrid.find((cell) => cell.row == row && cell.column == column)) {
+  //   alert(JSON.stringify(arrGrid));
+  // }
   let cell = {
     row: row,
     column: column,
@@ -461,7 +464,7 @@ function insertNoStitchBelow(row, column, arrGrid) {
   for (r = minR; r < row; r++) {
     let arrCells = arrGrid.filter((cell) => cell.row == r && cell.column >= column);
     for (i = 0; i < arrCells.length; i++) {
-      arrCells[i].column = arrCells[i].column + 1;
+      arrCells[i].column = parseInt(arrCells[i].column, 10) + 1;
     }
     addCellToGrid(r, column, colorNoStitch, arrGrid);
   }
@@ -560,18 +563,22 @@ function workRows(arrRow, arrRowStarts, arrGrid) {
     for (i = 1; i < startColumn; i++) {
       addCellToGrid(r, i, colorNoStitch, arrGrid);
     }
+    alert(arrRow[r]);
     let rowText = arrRow[r].split(":")[1];
     let arrStitchText = rowText.split(",");
     if (arrRow[r].indexOf("WS") > -1) {
       arrStitchText.reverse();
     }
-    let currColumn = startColumn;
+    let currColumn = parseInt(startColumn, 10);
     for (s = 0; s < arrStitchText.length; s++) {
       let stitchInstructions = splitStitchText(arrStitchText[s]);
       if (stitchInstructions.stitchType == increase) {
-        for (i = 0; i < stitchInstructions.stitchNumber; i++) {
-          insertNoStitchBelow(r, currColumn + i, arrGrid);
-          addCellToGrid(r, currColumn + i, rowColor, arrGrid);
+        for (si = 0; si < stitchInstructions.stitchNumber; si++) {
+          insertNoStitchBelow(r, currColumn + si, arrGrid);
+          addCellToGrid(r, currColumn + si, rowColor, arrGrid);
+        }
+        if (s > 0) {
+          currColumn = currColumn + stitchInstructions.stitchNumber;
         }
       }
       else {
@@ -597,9 +604,9 @@ function workRows(arrRow, arrRowStarts, arrGrid) {
             }
           }
         }
-      }
-      if (stitchInstructions.stitchType !== decrease || s > 0) {
-        currColumn = currColumn + stitchInstructions.stitchNumber;
+        if (stitchInstructions.stitchType !== decrease || s > 0) {
+          currColumn = currColumn + stitchInstructions.stitchNumber;
+        }
       }
     }
     let cellBelow = arrGrid.find((cell) => cell.row == r - 1 && cell.column == currColumn);
@@ -608,6 +615,7 @@ function workRows(arrRow, arrRowStarts, arrGrid) {
       currColumn = currColumn + 1;
       cellBelow = arrGrid.find((cell) => cell.row == r - 1 && cell.column == currColumn);
     }
+    alert(JSON.stringify(arrGrid.filter((cell) => cell.row == r)));
   }
 }
 
