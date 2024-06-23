@@ -7,6 +7,10 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <div id="divTemp"></div>
+  <button id="btnUndo" onclick="undo();">undo</button>
+  <button id="btnClearChart" onclick="clearChart();">clear</button>
+  <br />
   <b>Setup Chart:</b> 
   <select id="selChartType" onchange="changeChartType(this.value);">
     <option value="G">garter</option>
@@ -25,8 +29,7 @@
     <option value="S">select</option>
     <option value="F">fill</option>
   </select>
-  <button id="btnUndo" onclick="undo();">undo</button>
-  <button id="btnClearChart" onclick="clearChart();">clear</button>
+  <input id="chkShaping" type="checkbox" />shaping
   <br />
   <b>Import Image:</b>
   <input id="fleImage" type="file" />

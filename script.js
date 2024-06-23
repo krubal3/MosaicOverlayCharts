@@ -2,10 +2,12 @@ var pattern = {
   chartType: "G",
   gridColumns: 31,
   gridRows: 31,
-  cellsColorB: []
+  cellsColorB: [],
+  cellsNoStitch: []
 };
 var colorA = "white";
 var colorB = "silver";
+var colorNoStitch = "gainsboro";
 var maxGridColumns = 999;
 var maxGridRows = 999;
 var selection = {
@@ -16,6 +18,8 @@ var selection = {
 };
 var plain = "";
 var overlay = "X";
+var increase = "+";
+var decrease = "-";
 
 function getCell(row, column) {
   let td = document.getElementById("_" + row + "_" + column);
@@ -41,7 +45,7 @@ function changeGridColumns(gridColumns) {
   }
   let txtGridColumns = document.getElementById("txtGridColumns");
   txtGridColumns.value = gridColumns;
-  
+
   savePattern();
   loadChart();
   refreshPreview();
@@ -74,10 +78,10 @@ function changeMode() {
 function getIdRange(fromId, toId) {
   let fromIds = splitId(fromId);
   let toIds = splitId(toId);
-  
+
   let maxR = toIds.row;
   let minR = fromIds.row;
-  if (parseInt(maxR, 10) < parseInt(minR, 10)) { 
+  if (parseInt(maxR, 10) < parseInt(minR, 10)) {
     maxR = fromIds.row;
     minR = toIds.row;
   }
@@ -90,10 +94,10 @@ function getIdRange(fromId, toId) {
   if (minR < 1) {
     minR = 1;
   }
-  
+
   let maxC = toIds.column;
   let minC = fromIds.column;
-  if (parseInt(maxC, 10) < parseInt(minC, 10)) { 
+  if (parseInt(maxC, 10) < parseInt(minC, 10)) {
     maxC = fromIds.column;
     minC = toIds.column;
   }
@@ -147,39 +151,43 @@ function drawLine(fromR, fromC, toR, toC) {
   if (slope == 0) {
     if (minR < maxR) {
       for (r = minR; r <= maxR; r++) {
-        placePoint(r, fromC);
+        placePoint(r, fromC, colorB);
       }
     }
     else {
       for (c = minC; c <= maxC; c++) {
-        placePoint(fromR, c);
+        placePoint(fromR, c, colorB);
       }
     }
   }
   else {
     for (c = minC; c <= maxC; c++) {
       let r = Math.round((slope * c) + yIntercept);
-      placePoint(r, c);
+      placePoint(r, c, colorB);
     }
     for (r = minR; r <= maxR; r++) {
       let c = Math.round((r - yIntercept) / slope);
-      placePoint(r, c);
+      placePoint(r, c, colorB);
     }
   }
 }
 
-function placePoint(r, c, setColor = colorB) {
+function placePoint(r, c, setColor) {
   let td = getCell(r, c);
   if (td !== null) {
-    td.style.backgroundColor = setColor;
-    if ((setColor == colorA && r % 2 == 0) || (setColor == colorB && r % 2 !== 0)) {
-      td = getCell(r - 1, c);
-      if (td !== null) {
-        td.style.backgroundColor = setColor;
-      }
-      td = getCell(r + 1, c);
-      if (td !== null) {
-        td.style.backgroundColor = setColor;
+    if (td.style.backgroundColor !== colorNoStitch || isShaping()) {
+      td.style.backgroundColor = setColor;
+    }
+    if (setColor !== colorNoStitch) {
+      if ((setColor == colorA && r % 2 == 0) || (setColor == colorB && r % 2 !== 0)) {
+        td = getCell(r - 1, c);
+        if (td !== null && td.style.backgroundColor !== colorNoStitch) {
+          td.style.backgroundColor = setColor;
+        }
+        td = getCell(r + 1, c);
+        if (td !== null && td.style.backgroundColor !== colorNoStitch) {
+          td.style.backgroundColor = setColor;
+        }
       }
     }
   }
@@ -193,9 +201,9 @@ function drawCircle(fromR, fromC, toR, toC) {
   if (pattern.chartType == "S") {
     height = height * 1.33;
   }
-  let radius = Math.round(width/2);
+  let radius = Math.round(width / 2);
   if (width > height) {
-    radius = Math.round(height/2);
+    radius = Math.round(height / 2);
   }
   for (c = 0; c <= radius; c++) {
     let r = Math.sqrt((radius * radius) - (c * c));
@@ -203,10 +211,10 @@ function drawCircle(fromR, fromC, toR, toC) {
       r = 0.75 * r;
     }
     r = Math.round(r);
-    placePoint(centerR + r, centerC + c);
-    placePoint(centerR - r, centerC - c);
-    placePoint(centerR - r, centerC + c);
-    placePoint(centerR + r, centerC - c);
+    placePoint(centerR + r, centerC + c, colorB);
+    placePoint(centerR - r, centerC - c, colorB);
+    placePoint(centerR - r, centerC + c, colorB);
+    placePoint(centerR + r, centerC - c, colorB);
   }
   let radiusInR = radius;
   if (pattern.chartType == "S") {
@@ -219,16 +227,16 @@ function drawCircle(fromR, fromC, toR, toC) {
     }
     let c = Math.sqrt((radius * radius) - (currR * currR));
     c = Math.round(c);
-    placePoint(centerR + r, centerC + c);
-    placePoint(centerR - r, centerC - c);
-    placePoint(centerR - r, centerC + c);
-    placePoint(centerR + r, centerC - c);
+    placePoint(centerR + r, centerC + c, colorB);
+    placePoint(centerR - r, centerC - c, colorB);
+    placePoint(centerR - r, centerC + c, colorB);
+    placePoint(centerR + r, centerC - c, colorB);
   }
 }
 
 function selectShape(selShape) {
   let idRange = getIdRange(selection.fromId, selection.toId);
-  switch(selShape.value) {
+  switch (selShape.value) {
     case "|":
       drawLine(idRange.minR, idRange.maxC, idRange.maxR, idRange.maxC);
       break;
@@ -263,10 +271,10 @@ function selectShape(selShape) {
 
 function selectCutCopy(selCutCopy) {
   let idRange = getIdRange(selection.fromId, selection.toId);
-  
+
   let arrCells = new Array();
   for (r = pattern.gridRows; r > 1; r--) {
-    for (c = pattern.gridColumns-1; c > 1; c--) {
+    for (c = pattern.gridColumns - 1; c > 1; c--) {
       let gridTd = getCell(r, c);
       gridTd.style.borderColor = "";
       if (selCutCopy.value !== "cancel" && r >= idRange.minR && r <= idRange.maxR && c >= idRange.minC && c <= idRange.maxC) {
@@ -281,11 +289,11 @@ function selectCutCopy(selCutCopy) {
         }
       }
     }
-  } 
+  }
   if (selCutCopy.value !== "cancel") {
     selection.cells = arrCells;
   }
-  
+
   selection.fromId = "";
   selection.toId = "";
   selCutCopy.value = "";
@@ -310,7 +318,7 @@ function selectPaste(selPaste) {
     rowOffset = rowOffset + Math.round(fromHeight / 2)
     colOffset = colOffset - Math.round(toWidth / 2);
     colOffset = colOffset + Math.round(fromWidth / 2);
-  } 
+  }
   if (rowOffset % 2 !== 0) {
     rowOffset = rowOffset + 1;
   }
@@ -350,7 +358,7 @@ function selectPaste(selPaste) {
       }
     }
   }
-  
+
   hideSelection();
   selection.fromId = "";
   selection.toId = "";
@@ -381,7 +389,7 @@ function importImage() {
       if (pattern.chartType == "S") {
         wscale = 1.33 * hscale;
       }
-    }  
+    }
 
     cnvPlain.height = (imgImport.height * hscale);
     cnvPlain.width = (imgImport.width * wscale);
@@ -398,17 +406,17 @@ function importImage() {
 
     for (r = pattern.gridRows - 1; r > -1; r--) {
       for (c = pattern.gridColumns - 1; c > -1; c--) {
-  
+
         let redComp = imageData.data[((r * (cnvPlain.width * 4)) + (c * 4))];
         let greenComp = imageData.data[((r * (cnvPlain.width * 4)) + (c * 4)) + 1];
         let blueComp = imageData.data[((r * (cnvPlain.width * 4)) + (c * 4)) + 2];
         let trans = imageData.data[((r * (cnvPlain.width * 4)) + (c * 4)) + 3];
         let avg = (redComp + greenComp + blueComp) / 3
-      
+
         if (trans > 0 && avg < 200) {
           let currR = pattern.gridRows - r;
           let currC = pattern.gridColumns - c;
-          placePoint(currR, currC);
+          placePoint(currR, currC, colorB);
         }
       }
     }
@@ -431,61 +439,210 @@ function splitId(id) {
   }
 }
 
-function importInstructions() {
-  if (confirm("Previous design will be cleared.  Okay to continue?")) {
-    let instructions = document.getElementById("txtInstructions").value;
-    let iTimes = instructions.indexOf("times");
-    while (iTimes > -1) {
-      let tempText = instructions.substring(0, iTimes + "times".length);
-      let iBegParen = tempText.lastIndexOf("(");
-      let iEndParen = tempText.lastIndexOf(")");
-      let rptText = tempText.substring(iBegParen + 1, iEndParen);
-      let rptTimes = parseInt(tempText.substring(iEndParen + 1, iTimes), 10);
-      let oldText = tempText.substring(iBegParen);
-      let newText = "";
-      for (x = 1; x <= rptTimes; x++) {
-        newText = newText + rptText;
-        if (x < rptTimes) {
-          newText = newText + ",";
+function insertNoStitchBelow(row, column, arrGrid) {
+  let minR = 1;
+  for (r = row - 1; r > 0; r--) {
+    minR = r;
+    let cellBelow = arrGrid.find((cell) => cell.row == r && cell.column == column);
+    if (cellBelow !== undefined && cellBelow.color == colorNoStitch) {
+      minR = r + 1;
+      break;
+    }
+  }
+  for (r = minR; r < row; r++) {
+    let arrCells = arrGrid.filter((cell) => cell.row == r && cell.column >= column);
+    for (i = 0; i < arrCells.length; i++) {
+      arrCells[i].column = arrCells[i].column + 1;
+    }
+    let cell = {
+      row: r,
+      column: column,
+      color: colorNoStitch
+    }
+    arrGrid.push(cell);
+  }
+}
+
+function expandInstructionTimes(instructions) {
+  let iTimes = instructions.indexOf("times");
+  while (iTimes > -1) {
+    let tempText = instructions.substring(0, iTimes + "times".length);
+    let iBegParen = tempText.lastIndexOf("(");
+    let iEndParen = tempText.lastIndexOf(")");
+    let rptText = tempText.substring(iBegParen + 1, iEndParen);
+    let rptTimes = parseInt(tempText.substring(iEndParen + 1, iTimes), 10);
+    let oldText = tempText.substring(iBegParen);
+    let newText = "";
+    for (x = 1; x <= rptTimes; x++) {
+      newText = newText + rptText;
+      if (x < rptTimes) {
+        newText = newText + ", ";
+      }
+    }
+    instructions = instructions.replace(oldText, newText);
+    iTimes = instructions.indexOf("times");
+  }
+  return instructions;
+}
+
+function splitStitchText(stitchText) {
+  stitchText = stitchText.trim();
+  let stitchInstructions = {
+    stitchNumber: parseInt(stitchText, 10),
+    stitchType: ""
+  }
+  switch (stitchText.substring(stitchText.length - 1)) {
+    case overlay:
+      stitchInstructions.stitchType = overlay;
+      break;
+    case increase:
+      stitchInstructions.stitchType = increase;
+      break;
+    case decrease:
+      stitchInstructions.stitchType = decrease;
+      break;
+  }
+  return stitchInstructions;
+}
+
+function readShaping(arrRow, arrRowStarts) {
+  for (r = 1; r <= pattern.gridRows; r++) {
+    let rowText = arrRow[r].split(":")[1];
+    let arrStitchText = rowText.split(",");
+    if (arrRow[r].indexOf("WS") > -1) {
+      arrStitchText.reverse();
+    }
+    let firstSts = arrStitchText[0].trim();
+    let stitchInstructions = splitStitchText(firstSts);
+    if (r == 1) {
+      let row = {
+        row: r,
+        startColumn: 1
+      }
+      arrRowStarts.push(row)
+    }
+    else {
+      let startColumn = arrRowStarts.find((rs) => rs.row == r - 1).startColumn;
+      if (stitchInstructions.stitchType == decrease) {
+        startColumn = startColumn + stitchInstructions.stitchNumber;
+      } 
+      if (stitchInstructions.stitchType == increase) {
+        startColumn = startColumn - stitchInstructions.stitchNumber;
+      }     
+      let row = {
+        row: r,
+        startColumn: startColumn
+      }
+      arrRowStarts.push(row)
+    }
+  }
+  arrRowStarts.sort((a,b) => a.startColumn - b.startColumn);
+  let minStart = arrRowStarts[0].startColumn;
+  if (minStart < 1) {
+    let colOffset = Math.abs(minStart) + 1;
+    for (i = 0; i < arrRowStarts.length; i++) {
+      arrRowStarts[i].startColumn = arrRowStarts[i].startColumn  + colOffset;
+    }
+  }
+}
+
+function workRows(arrRow, arrRowStarts, arrGrid) {
+  for (r = 1; r <= pattern.gridRows; r++) {
+    let rowColor = colorA;
+    if (r % 2 == 0) {
+      rowColor = colorB;
+    }
+    let startColumn = arrRowStarts.find((rs) => rs.row == r).startColumn;
+    for (i = 1; i < startColumn; i++) {
+      let cell = {
+        row: r,
+        column: i,
+        color: colorNoStitch
+      }
+      arrGrid.push(cell);
+    }
+    let rowText = arrRow[r].split(":")[1];
+    let arrStitchText = rowText.split(",");
+    if (arrRow[r].indexOf("WS") > -1) {
+      arrStitchText.reverse();
+    }
+    let currColumn = startColumn;
+    for (s = 0; s < arrStitchText.length; s++) {
+      let stitchInstructions = splitStitchText(arrStitchText[s]);
+      if (stitchInstructions.stitchType == increase) {
+        for (i = 0; i < stitchInstructions.stitchNumber; i++) {
+          insertNoStitchBelow(r, currColumn + i, arrGrid);
+          let cell = {
+            row: r,
+            column: currColumn + i,
+            color: rowColor
+          }
+          arrGrid.push(cell);
         }
       }
-      instructions = instructions.replace(oldText, newText);
-      iTimes = instructions.indexOf("times");
-    }
-    let arrRow = instructions.split("row ");
-    pattern.gridRows = arrRow.length - 1;
-    pattern.gridColumns = parseInt(arrRow[1].split(":")[1].trim(), 10);
-    loadChart();
-    for (r = 1; r <= pattern.gridRows; r++) {
-      for (c = 1; c <= pattern.gridColumns; c++) {
-        let td = getCell(r, c);
-        td.style.backgroundColor = colorA;
-        if (r % 2 == 0) {
-          td.style.backgroundColor = colorB;
+      else {
+        let cellBelow = arrGrid.find((cell) => cell.row == r - 1 && cell.column == currColumn);
+        while (cellBelow !== undefined && cellBelow.color == colorNoStitch) {
+          let cell = {
+            row: r,
+            column: currColumn,
+            color: colorNoStitch
+          }
+          arrGrid.push(cell);
+          currColumn = currColumn + 1;
+          cellBelow = arrGrid.find((cell) => cell.row == r - 1 && cell.column == currColumn);
         }
-      }
-    }
-    for (r = 1; r <= pattern.gridRows; r++) {
-     let arrSts = arrRow[r].split(":")[1].split(",");
-     let currCol = 1;
-     for (s = 0; s < arrSts.length; s++) {
-      let numSts = parseInt(arrSts[s], 10);
-      if (arrSts[s].indexOf(overlay) > -1) {
-        for (c = currCol; c < currCol + numSts; c++) {
-          let td = getCell(r - 1, c);
-          td.style.backgroundColor = colorA;
-          if (r % 2 == 0) {
-            td.style.backgroundColor = colorB;
+        for (i = 0; i < stitchInstructions.stitchNumber; i++) {
+          let stColor = rowColor;
+          if (stitchInstructions.stitchType == decrease) {
+            stColor = colorNoStitch;
+          }
+          let cell = {
+            row: r,
+            column: currColumn + i,
+            color: stColor
+          }
+          arrGrid.push(cell);
+          if (stitchInstructions.stitchType == overlay) {
+            cellBelow = arrGrid.find((cell) => cell.row == r - 1 && cell.column == currColumn + i);
+            if (cellBelow !== undefined && cellBelow.color !== colorNoStitch) {
+              cellBelow.color = rowColor;
+            }
           }
         }
       }
-      currCol = currCol + numSts;
-     } 
+      currColumn = currColumn + stitchInstructions.stitchNumber;
+    }
+  }
+}
+
+function importInstructions() {
+  let instructions = document.getElementById("txtInstructions").value;
+  if (clearChart()) {
+    instructions = expandInstructionTimes(instructions);
+    let arrRow = instructions.split("row ");
+    pattern.gridRows = arrRow.length - 1;
+    pattern.gridColumns = 1;
+    let arrRowStarts = new Array();
+    readShaping(arrRow, arrRowStarts);
+    let arrGrid = new Array();
+    workRows(arrRow, arrRowStarts, arrGrid);
+    if (arrGrid.length > 0) {
+      arrGrid.sort((a,b) => b.column - a.column);
+      pattern.gridColumns = arrGrid[0].column;
+    }  
+    arrGrid.sort((a,b) => a.column - b.column);
+    arrGrid.sort((a,b) => a.row - b.row);
+    loadChart();
+    for (i = 0; i < arrGrid.length; i++) {
+      let td = getCell(arrGrid[i].row, arrGrid[i].column);
+      td.style.backgroundColor = arrGrid[i].color;
     }
     addXs();
     savePattern();
     refreshPreview();
     writeInstructions();
+    alert("Imported");
   }
 }
 
@@ -496,25 +653,25 @@ function refreshPreview() {
     hscale = 4;
   }
   var cnvPlain = document.getElementById("cnvPlain");
-  cnvPlain.width  = parseInt(pattern.gridColumns, 10) * wscale;
+  cnvPlain.width = parseInt(pattern.gridColumns, 10) * wscale;
   cnvPlain.height = parseInt(pattern.gridRows, 10) * hscale;
   var ctx = cnvPlain.getContext("2d");
   ctx.clearRect(0, 0, cnvPlain.width, cnvPlain.height);
   ctx.lineWidth = hscale;
 
   var cnvReverse = document.getElementById("cnvReverse");
-  cnvReverse.width  = parseInt(pattern.gridColumns, 10) * wscale;
+  cnvReverse.width = parseInt(pattern.gridColumns, 10) * wscale;
   cnvReverse.height = parseInt(pattern.gridRows, 10) * hscale;
   var ctxRev = cnvReverse.getContext("2d");
   ctxRev.clearRect(0, 0, cnvReverse.width, cnvReverse.height);
   ctxRev.lineWidth = hscale;
 
   var cnvStripe = document.getElementById("cnvStripe");
-  cnvStripe.width  = parseInt(pattern.gridColumns, 10) * wscale;
+  cnvStripe.width = parseInt(pattern.gridColumns, 10) * wscale;
   cnvStripe.height = parseInt(pattern.gridRows, 10) * hscale;
   var ctxStr = cnvStripe.getContext("2d");
   ctxStr.clearRect(0, 0, cnvStripe.width, cnvStripe.height);
-      
+
   ctxStr.strokeStyle = "silver";
   ctxStr.lineWidth = hscale / 2;
   for (r = pattern.gridRows; r > 0; r--) {
@@ -522,7 +679,7 @@ function refreshPreview() {
     if (y % 4 == 0) {
       ctxStr.beginPath();
       ctxStr.moveTo(0, y);
-      ctxStr.lineTo((pattern.gridColumns-1)*wscale, y);
+      ctxStr.lineTo((pattern.gridColumns - 1) * wscale, y);
       ctxStr.stroke();
       ctxStr.closePath();
     }
@@ -535,24 +692,24 @@ function refreshPreview() {
     for (c = pattern.gridColumns; c > 0; c--) {
       let td = getCell(r, c);
       let x = (parseInt(pattern.gridColumns, 10) - c) * wscale;
-      
+
       if (td.style.backgroundColor == colorB) {
         ctx.beginPath();
         ctx.moveTo(x, y);
-        ctx.lineTo(x+wscale,y);
+        ctx.lineTo(x + wscale, y);
         ctx.stroke();
         ctx.closePath();
 
         ctxStr.beginPath();
         ctxStr.moveTo(x, y);
-        ctxStr.lineTo(x+wscale,y);
+        ctxStr.lineTo(x + wscale, y);
         ctxStr.stroke();
         ctxStr.closePath();
       }
       else {
         ctxRev.beginPath();
         ctxRev.moveTo(x, y);
-        ctxRev.lineTo(x+wscale,y);
+        ctxRev.lineTo(x + wscale, y);
         ctxRev.stroke();
         ctxRev.closePath();
       }
@@ -584,21 +741,37 @@ function writeInstructions() {
     }
     else {
       instruct = instruct + ", RS";
-    } 
+    }
     instruct = instruct + "): "
 
     let arrSts = new Array();
     for (c = 1; c <= pattern.gridColumns; c++) {
       let txt = plain;
       let td = getCell(r, c);
+      let currColor = td.style.backgroundColor;
       if (td.innerHTML == overlay) {
         txt = overlay;
       }
-      let st = {
-        "num": 1,
-        "txt": txt
-      };
-      arrSts.push(st);
+      if (r > 1) {
+        let tdBelow = getCell(r - 1, c);
+        let belowColor = currColor;
+        if (tdBelow !== null) {
+          belowColor = tdBelow.style.backgroundColor;
+        }
+        if (currColor == colorNoStitch && belowColor !== colorNoStitch) {
+          txt = decrease;
+        }
+        if (currColor !== colorNoStitch && belowColor == colorNoStitch) {
+          txt = increase;
+        }
+      }
+      if (currColor !== colorNoStitch || txt !== "") {
+        let st = {
+          "num": 1,
+          "txt": txt
+        };
+        arrSts.push(st);
+      }
     }
     if (pattern.chartType == "C" && (r % 4 == 3 || r % 4 == 0)) {
       arrSts.reverse();
@@ -622,7 +795,7 @@ function convertRow(arrSts) {
   }
 
   let txt = "";
-  for (s = 0; s < arrSts.length; s++){
+  for (s = 0; s < arrSts.length; s++) {
     txt = txt + arrSts[s].txt;
     if (s < arrSts.length - 1) {
       txt = txt + ", ";
@@ -633,10 +806,10 @@ function convertRow(arrSts) {
 
 function sumSts(arrSts) {
   for (s = 1; s < arrSts.length; s++) {
-    if (arrSts[s].num > 0 && arrSts[s].txt == arrSts[s-1].txt) {
-      arrSts[s].num = arrSts[s].num + arrSts[s-1].num;
-      arrSts[s-1].num = 0;
-      arrSts[s-1].txt = "";
+    if (arrSts[s].num > 0 && arrSts[s].txt == arrSts[s - 1].txt) {
+      arrSts[s].num = arrSts[s].num + arrSts[s - 1].num;
+      arrSts[s - 1].num = 0;
+      arrSts[s - 1].txt = "";
     }
   }
   return removeEmpty(arrSts);
@@ -661,7 +834,7 @@ function concatSts(arrSts) {
 }
 
 function convertToSingle(arrSts) {
-  for (s = 0; s < arrSts.length; s++){
+  for (s = 0; s < arrSts.length; s++) {
     if (arrSts[s].num > 1) {
       arrSts[s].txt = "(" + arrSts[s].txt + ") " + arrSts[s].num + " times";
       arrSts[s].num = 1;
@@ -672,9 +845,9 @@ function convertToSingle(arrSts) {
 
 function concatSingles(arrSts) {
   for (s = 1; s < arrSts.length; s++) {
-    if (arrSts[s].num == 1 && arrSts[s-1].num == 1) {
-      arrSts[s-1].txt = arrSts[s-1].txt + ", " + arrSts[s].txt;
-      arrSts[s-1].num = 1;
+    if (arrSts[s].num == 1 && arrSts[s - 1].num == 1) {
+      arrSts[s - 1].txt = arrSts[s - 1].txt + ", " + arrSts[s].txt;
+      arrSts[s - 1].num = 1;
       arrSts[s].num = 0;
       arrSts[s].txt = "";
     }
@@ -700,28 +873,53 @@ function clearChart() {
   return ret;
 }
 
+function getEdgeColumns(row) {
+  let edgeColumns = {
+    first: 1,
+    last: pattern.gridColumns
+  }
+  for (c = 1; c <= pattern.gridColumns; c++) {
+    let td = getCell(row, c);
+    if (td !== null && td.style.backgroundColor !== colorNoStitch) {
+      edgeColumns.first = c;
+      break;
+    }
+  }
+  for (c = pattern.gridColumns; c >= 1; c--) {
+    let td = getCell(row, c);
+    if (td !== null && td.style.backgroundColor !== colorNoStitch) {
+      edgeColumns.last = c;
+      break;
+    }
+  }
+  return edgeColumns;
+}
+
 function addXs() {
   for (r = pattern.gridRows; r > 1; r--) {
-    for (c = pattern.gridColumns-1; c > 1; c--) {
+    let edgeColumns = getEdgeColumns(r);
+    for (c = pattern.gridColumns; c >= 1; c--) {
       let td = getCell(r, c);
-      let rBelow = parseInt(r,10) - 1;
+      let rBelow = parseInt(r, 10) - 1;
       let tdBelow = getCell(rBelow, c);
       let color = td.style.backgroundColor;
       let colorBelow = tdBelow.style.backgroundColor;
-      if (r % 2 == 0) {
-        if (color == colorB && colorBelow == colorB) {
-          td.innerHTML = overlay;
-        }
-        else {
-          td.innerHTML = plain;
+      td.innerHTML = plain;
+      if (c == edgeColumns.first || c == edgeColumns.last) {
+        if (r % 2 == 0) {
+          td.style.backgroundColor = colorB;
         }
       }
       else {
-        if (color == colorB || colorBelow == colorB) {
-          td.innerHTML = plain;
+        if (r % 2 == 0) {
+          if (color == colorB && colorBelow == colorB) {
+            td.innerHTML = overlay;
+          }
         }
         else {
-          td.innerHTML = overlay;
+          if (color == colorA && colorBelow == colorA) {
+            td.innerHTML = overlay;
+          }
         }
       }
     }
@@ -732,12 +930,22 @@ function toggleCell(td) {
   let id = splitId(td.id);
   let r = id.row;
   let c = id.column;
-  if (r > 1 && r < pattern.gridRows && c > 1 && c < pattern.gridColumns) {
-    if (td.style.backgroundColor == colorB) {
-      placePoint(r, c, colorA);
+  if (td.style.backgroundColor !== colorNoStitch && !isShaping()) {
+    if (r > 1 && r < pattern.gridRows && c > 1 && c < pattern.gridColumns) {
+      if (td.style.backgroundColor == colorB) {
+        placePoint(r, c, colorA);
+      }
+      else {
+        placePoint(r, c, colorB);
+      }
     }
-    else  {
-      placePoint(r, c, colorB);
+  }
+  if (isShaping()) {
+    if (td.style.backgroundColor == colorNoStitch) {
+      td.style.backgroundColor = colorA;
+    }
+    else {
+      td.style.backgroundColor = colorNoStitch;
     }
   }
   addXs();
@@ -754,17 +962,17 @@ function selectCell(td) {
   else {
     selection.toId = td.id;
     let idRange = getIdRange(selection.fromId, selection.toId);
-    
+
     for (r = pattern.gridRows; r > 1; r--) {
-      for (c = pattern.gridColumns-1; c > 1; c--) {
+      for (c = pattern.gridColumns - 1; c > 1; c--) {
         let gridTd = getCell(r, c);
         gridTd.style.borderColor = "";
         if (r >= idRange.minR && r <= idRange.maxR && c >= idRange.minC && c <= idRange.maxC) {
           gridTd.style.borderColor = "red";
         }
       }
-    } 
-    
+    }
+
     let divSelectionMenu = document.getElementById("divSelectionMenu");
     divSelectionMenu.style.display = "";
     let selPaste = document.getElementById("selPaste");
@@ -777,14 +985,14 @@ function selectCell(td) {
   }
 }
 
-function fillRow(cellId, fillColor) {
+function fillRow(cellId, fillColor, currColor) {
   let minC = parseInt(cellId.column, 10);
   while (minC > 2) {
     let checkCell = getCell(cellId.row, minC - 1);
-    if (fillColor == colorA) {
+    if (fillColor == colorA && !isShaping()) {
       checkCell = getCell(cellId.row, minC - 2);
     }
-    if (checkCell.style.backgroundColor == fillColor) {
+    if (checkCell.style.backgroundColor !== currColor) {
       break;
     }
     minC = minC - 1;
@@ -792,10 +1000,10 @@ function fillRow(cellId, fillColor) {
   let maxC = parseInt(cellId.column, 10);
   while (maxC < pattern.gridColumns - 2) {
     let checkCell = getCell(cellId.row, maxC + 1);
-    if (fillColor == colorA) {
+    if (fillColor == colorA && !isShaping()) {
       checkCell = getCell(cellId.row, maxC + 2);
     }
-    if (checkCell.style.backgroundColor == fillColor) {
+    if (checkCell.style.backgroundColor !== currColor) {
       break;
     }
     maxC = maxC + 1;
@@ -812,62 +1020,75 @@ function fillRow(cellId, fillColor) {
 
 function fill(td) {
   let cellId = splitId(td.id);
+  let currColor = td.style.backgroundColor;
   let fillColor = colorB;
-  if (td.style.backgroundColor == colorB) {
+  if (isShaping()) {
+    fillColor = colorNoStitch;
+  }
+  if (fillColor == currColor) {
     fillColor = colorA;
   }
-  let minR = parseInt(cellId.row, 10);
-  while (minR > 2) {
-    let checkCell = getCell(minR - 1, cellId.column);
-    if (fillColor == colorA) {
-      checkCell = getCell(minR - 2, cellId.column);
-    }
-    if (checkCell == null || checkCell.style.backgroundColor == fillColor) {
-      break;
-    }
-    minR = minR - 1;
-  }
-  let maxR = parseInt(cellId.row, 10);
-  while (maxR <= pattern.gridRows - 2) {
-    let checkCell = getCell(maxR  + 1, cellId.column);
-    if (fillColor == colorA) {
-      checkCell = getCell(maxR  + 2, cellId.column);
-    }
-    if (checkCell == null || checkCell.style.backgroundColor == fillColor) {
-      break;
-    }
-    maxR = maxR + 1;
-  }
-  let prevMinMaxC = {
-  }
-  for (r = minR; r <= maxR; r++) {
-    cellId.row = r;
-    let minMaxC = fillRow(cellId, fillColor);
-    if (r > minR && fillColor == colorA) {
-      if (prevMinMaxC.minC < minMaxC.minC) {
-        drawLine(r-1, minMaxC.minC - 1, r-1, prevMinMaxC.minC - 1);
+  if (currColor !== colorNoStitch || isShaping()) {
+    let minR = parseInt(cellId.row, 10);
+    while (minR > 2) {
+      let checkCell = getCell(minR - 1, cellId.column);
+      if (fillColor == colorA && !isShaping()) {
+        checkCell = getCell(minR - 2, cellId.column);
       }
-      if (prevMinMaxC.minC > minMaxC.minC) {
-        drawLine(r, minMaxC.minC - 1, r, prevMinMaxC.minC - 1);
+      if (checkCell == null || checkCell.style.backgroundColor !== currColor) {
+        break;
       }
-      if (prevMinMaxC.maxC > minMaxC.maxC) {
-        drawLine(r-1, minMaxC.maxC + 1, r-1, prevMinMaxC.maxC + 1);
-      }
-      if (prevMinMaxC.maxC < minMaxC.maxC) {
-        drawLine(r, minMaxC.maxC + 1, r, prevMinMaxC.maxC + 1);
-      }
+      minR = minR - 1;
     }
-    prevMinMaxC = minMaxC;
+    let maxR = parseInt(cellId.row, 10);
+    while (maxR <= pattern.gridRows - 2) {
+      let checkCell = getCell(maxR + 1, cellId.column);
+      if (fillColor == colorA && !isShaping()) {
+        checkCell = getCell(maxR + 2, cellId.column);
+      }
+      if (checkCell == null || checkCell.style.backgroundColor !== currColor) {
+        break;
+      }
+      maxR = maxR + 1;
+    }
+    let prevMinMaxC = {
+    }
+    for (r = minR; r <= maxR; r++) {
+      cellId.row = r;
+      let minMaxC = fillRow(cellId, fillColor, currColor);
+      if (r > minR && fillColor == colorA && !isShaping()) {
+        if (prevMinMaxC.minC < minMaxC.minC) {
+          drawLine(r - 1, minMaxC.minC - 1, r - 1, prevMinMaxC.minC - 1);
+        }
+        if (prevMinMaxC.minC > minMaxC.minC) {
+          drawLine(r, minMaxC.minC - 1, r, prevMinMaxC.minC - 1);
+        }
+        if (prevMinMaxC.maxC > minMaxC.maxC) {
+          drawLine(r - 1, minMaxC.maxC + 1, r - 1, prevMinMaxC.maxC + 1);
+        }
+        if (prevMinMaxC.maxC < minMaxC.maxC) {
+          drawLine(r, minMaxC.maxC + 1, r, prevMinMaxC.maxC + 1);
+        }
+      }
+      prevMinMaxC = minMaxC;
+    }
+    addXs();
+    savePattern();
+    refreshPreview();
+    writeInstructions();
   }
-  addXs();
-  savePattern();
-  refreshPreview();
-  writeInstructions();
+}
+
+function isShaping() {
+  return document.getElementById("chkShaping").checked;
+}
+
+function chartMode() {
+  return document.getElementById("selMode").value;
 }
 
 function clickCell(td) {
-  let mode = document.getElementById("selMode").value;
-  switch (mode) {
+  switch (chartMode()) {
     case "T":
       toggleCell(td);
       break;
@@ -877,7 +1098,7 @@ function clickCell(td) {
     case "F":
       fill(td);
       break;
-  }  
+  }
 }
 
 function undo() {
@@ -894,18 +1115,23 @@ function undo() {
 
 function savePattern() {
   let cellsColorB = new Array();
-  for (r = pattern.gridRows; r > 1; r--) {
-    for (c = pattern.gridColumns-1; c > 1; c--) {
+  let cellsNoStitch = new Array();
+  for (r = pattern.gridRows; r >= 1; r--) {
+    for (c = pattern.gridColumns ; c >= 1; c--) {
       let td = getCell(r, c);
       if (td !== null) {
         let tdColor = td.style.backgroundColor;
         if (tdColor == colorB) {
           cellsColorB.push(td.id);
         }
+        if (tdColor == colorNoStitch) {
+          cellsNoStitch.push(td.id);
+        }
       }
     }
   }
   pattern.cellsColorB = cellsColorB;
+  pattern.cellsNoStitch = cellsNoStitch;
   if (localStorage.getItem("pattern") !== null && localStorage.getItem("pattern") !== JSON.stringify(pattern)) {
     localStorage.setItem("patternUndo", localStorage.getItem("pattern"));
   }
@@ -961,7 +1187,7 @@ function loadChart() {
         text = document.createTextNode(r);
       }
     }
-    
+
     td.appendChild(text);
     row.appendChild(td);
 
@@ -975,11 +1201,6 @@ function loadChart() {
       }
       td.id = "_" + r + "_" + c;
       td.style.backgroundColor = colorA;
-      if (c == 1 || c == pattern.gridColumns) {
-        if (r % 2 == 0) {
-          td.style.backgroundColor = colorB; 
-        }
-      }
       row.appendChild(td);
     }
 
@@ -1001,7 +1222,7 @@ function loadChart() {
     td.appendChild(text);
     row.appendChild(td);
   }
-  
+
   row = thead.insertRow();
   td = document.createElement("td");
   text = document.createTextNode("");
@@ -1024,6 +1245,12 @@ function loadChart() {
       td.style.backgroundColor = colorB;
     }
   }
+  for (i = 0; i < pattern.cellsNoStitch.length; i++) {
+    td = document.getElementById(pattern.cellsNoStitch[i]);
+    if (td !== null) {
+      td.style.backgroundColor = colorNoStitch;
+    }
+  }
   addXs();
 }
 
@@ -1032,14 +1259,14 @@ addEventListener('load', loadChart());
 addEventListener('load', refreshPreview());
 addEventListener('load', writeInstructions());
 
-window.addEventListener('load', function() {
-  document.getElementById("fleImage").addEventListener("change", function() {
+window.addEventListener('load', function () {
+  document.getElementById("fleImage").addEventListener("change", function () {
     if (this.files && this.files[0]) {
       var img = document.getElementById("imgImport");
       img.onload = () => {
-          URL.revokeObjectURL(img.src);  
+        URL.revokeObjectURL(img.src);
       }
-      img.src = URL.createObjectURL(this.files[0]); 
+      img.src = URL.createObjectURL(this.files[0]);
     }
   });
 });
