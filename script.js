@@ -439,6 +439,15 @@ function splitId(id) {
   }
 }
 
+function addCellToGrid(row, column, color, arrGrid) {
+  let cell = {
+    row: row,
+    column: column,
+    color: color
+  }
+  arrGrid.push(cell);
+}
+
 function insertNoStitchBelow(row, column, arrGrid) {
   let minR = 1;
   for (r = row - 1; r > 0; r--) {
@@ -454,12 +463,7 @@ function insertNoStitchBelow(row, column, arrGrid) {
     for (i = 0; i < arrCells.length; i++) {
       arrCells[i].column = arrCells[i].column + 1;
     }
-    let cell = {
-      row: r,
-      column: column,
-      color: colorNoStitch
-    }
-    arrGrid.push(cell);
+    addCellToGrid(r, column, colorNoStitch, arrGrid);
   }
 }
 
@@ -554,12 +558,7 @@ function workRows(arrRow, arrRowStarts, arrGrid) {
     }
     let startColumn = arrRowStarts.find((rs) => rs.row == r).startColumn;
     for (i = 1; i < startColumn; i++) {
-      let cell = {
-        row: r,
-        column: i,
-        color: colorNoStitch
-      }
-      arrGrid.push(cell);
+      addCellToGrid(r, i, colorNoStitch, arrGrid);
     }
     let rowText = arrRow[r].split(":")[1];
     let arrStitchText = rowText.split(",");
@@ -572,23 +571,13 @@ function workRows(arrRow, arrRowStarts, arrGrid) {
       if (stitchInstructions.stitchType == increase) {
         for (i = 0; i < stitchInstructions.stitchNumber; i++) {
           insertNoStitchBelow(r, currColumn + i, arrGrid);
-          let cell = {
-            row: r,
-            column: currColumn + i,
-            color: rowColor
-          }
-          arrGrid.push(cell);
+          addCellToGrid(r, currColumn + i, rowColor, arrGrid);
         }
       }
       else {
         let cellBelow = arrGrid.find((cell) => cell.row == r - 1 && cell.column == currColumn);
         while (cellBelow !== undefined && cellBelow.color == colorNoStitch) {
-          let cell = {
-            row: r,
-            column: currColumn,
-            color: colorNoStitch
-          }
-          arrGrid.push(cell);
+          addCellToGrid(r, currColumn, colorNoStitch, arrGrid);
           currColumn = currColumn + 1;
           cellBelow = arrGrid.find((cell) => cell.row == r - 1 && cell.column == currColumn);
         }
@@ -597,12 +586,7 @@ function workRows(arrRow, arrRowStarts, arrGrid) {
           if (stitchInstructions.stitchType == decrease) {
             stColor = colorNoStitch;
           }
-          let cell = {
-            row: r,
-            column: currColumn + i,
-            color: stColor
-          }
-          arrGrid.push(cell);
+          addCellToGrid(r, currColumn + i, stColor, arrGrid);
           if (stitchInstructions.stitchType == overlay) {
             cellBelow = arrGrid.find((cell) => cell.row == r - 1 && cell.column == currColumn + i);
             if (cellBelow !== undefined && cellBelow.color !== colorNoStitch) {
