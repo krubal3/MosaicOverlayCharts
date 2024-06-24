@@ -878,6 +878,18 @@ function changeReversePreview() {
   refreshPreview();
 }
 
+// when the preview shape is changed, 
+// refresh the preview 
+// to display for the newly selected shape
+function changePreviewShape() {
+  refreshPreview();
+}
+
+// returns the currently selected preview shape
+function previewShape() {
+  return document.getElementById("selPreviewShape").value;
+}
+
 // when changes are made to the chart
 // refreshes the preview of the project
 function refreshPreview() {

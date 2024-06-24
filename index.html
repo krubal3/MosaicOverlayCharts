@@ -71,15 +71,27 @@
     <table id="tblChart"></table>
   </div>
   <br/>
-  <input id="chkReversePreview" type="checkbox" onchange="changeReversePreview();" /> reverse colors
+  <div style="float: left;">
+    <canvas id="cnvPlain" width="31" height="31"></canvas>
+  </div>
+  <div>
+    <input id="chkReversePreview" type="checkbox" onchange="changeReversePreview();" /> reverse colors
+    <br />
+    shape:
+    <select id="selPreviewShape" onchange="changePreviewShape();">
+      <option value="">as charted</option>
+      <option value="S">square</option>
+      <option value="H">hexagon</option>
+    </select>
+  </div>   
+  <div style="clear: left;">
+    <b>Instructions:</b> 
+    <button id="btnImportInstructions" onclick="importInstructions();">import</button>
+    <br />
+    <textarea id="txtInstructions" cols="80" rows="30"></textarea>
+  </div>
   <br />
-  <canvas id="cnvPlain" width="31" height="31"></canvas>
   
-  <br />
-  <b>Instructions:</b> 
-  <button id="btnImportInstructions" onclick="importInstructions();">import</button>
-  <br />
-  <textarea id="txtInstructions" cols="80" rows="30"></textarea>
   <br />
   <img id="imgImport" style="display: none;" />
   <script src="script.js"></script>
