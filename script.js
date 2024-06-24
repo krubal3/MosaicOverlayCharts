@@ -865,6 +865,19 @@ function selectPaste(selPaste) {
 
 // -- preview --
 
+// whether or not the reverse checkbox is checked above the preview
+// returns true if the checkbox is checked
+// otherwise returns false.
+function isReversePreview() {
+  return document.getElementById("chkReversePreview").checked;
+}
+
+// when the reverse checkbox is checked or unchecked
+// refreshes the preview to show the correct colors
+function changeReversePreview() {
+  refreshPreview();
+}
+
 // when changes are made to the chart
 // refreshes the preview of the project
 function refreshPreview() {
@@ -879,61 +892,28 @@ function refreshPreview() {
   var ctx = cnvPlain.getContext("2d");
   ctx.clearRect(0, 0, cnvPlain.width, cnvPlain.height);
   ctx.lineWidth = hscale;
-
-  var cnvReverse = document.getElementById("cnvReverse");
-  cnvReverse.width = parseInt(pattern.gridColumns, 10) * wscale;
-  cnvReverse.height = parseInt(pattern.gridRows, 10) * hscale;
-  var ctxRev = cnvReverse.getContext("2d");
-  ctxRev.clearRect(0, 0, cnvReverse.width, cnvReverse.height);
-  ctxRev.lineWidth = hscale;
-
-  var cnvStripe = document.getElementById("cnvStripe");
-  cnvStripe.width = parseInt(pattern.gridColumns, 10) * wscale;
-  cnvStripe.height = parseInt(pattern.gridRows, 10) * hscale;
-  var ctxStr = cnvStripe.getContext("2d");
-  ctxStr.clearRect(0, 0, cnvStripe.width, cnvStripe.height);
-
-  ctxStr.strokeStyle = "silver";
-  ctxStr.lineWidth = hscale / 2;
-  for (r = pattern.gridRows; r > 0; r--) {
-    let y = (parseInt(pattern.gridRows, 10) - r) * hscale;
-    if (y % 4 == 0) {
-      ctxStr.beginPath();
-      ctxStr.moveTo(0, y);
-      ctxStr.lineTo((pattern.gridColumns - 1) * wscale, y);
-      ctxStr.stroke();
-      ctxStr.closePath();
-    }
-  }
-
-  ctxStr.strokeStyle = "black";
-  ctxStr.lineWidth = hscale;
   for (r = pattern.gridRows; r > 0; r--) {
     let y = (parseInt(pattern.gridRows, 10) - r) * hscale;
     for (c = pattern.gridColumns; c > 0; c--) {
       let td = getCell(r, c);
       let x = (parseInt(pattern.gridColumns, 10) - c) * wscale;
-
-      if (td.style.backgroundColor == colorB) {
-        ctx.beginPath();
-        ctx.moveTo(x, y);
-        ctx.lineTo(x + wscale, y);
-        ctx.stroke();
-        ctx.closePath();
-
-        ctxStr.beginPath();
-        ctxStr.moveTo(x, y);
-        ctxStr.lineTo(x + wscale, y);
-        ctxStr.stroke();
-        ctxStr.closePath();
+      let currColor = td.style.backgroundColor;
+      if (isReversePreview()) {
+        if (currColor == colorA) {
+          currColor = colorB;
+        }
+        else {
+          if (currColor == colorB) {
+            currColor = colorA;
+          }
+        }
       }
-      else {
-        ctxRev.beginPath();
-        ctxRev.moveTo(x, y);
-        ctxRev.lineTo(x + wscale, y);
-        ctxRev.stroke();
-        ctxRev.closePath();
-      }
+      ctx.strokeStyle = currColor;
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.lineTo(x + wscale, y);
+      ctx.stroke();
+      ctx.closePath();
     }
   }
 }
