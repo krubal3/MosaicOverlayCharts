@@ -613,7 +613,7 @@ function placePoint(row, column, setColor) {
 function drawLine(fromR, fromC, toR, toC) {
   let slope = 0;
   let lineColor = colorB;
-  if (isShaping) {
+  if (isShaping()) {
     lineColor = colorNoStitch;
   }
   if (fromC !== toC) {
@@ -890,18 +890,18 @@ function previewShape() {
   return document.getElementById("selPreviewShape").value;
 }
 
-// when changes are made to the chart
-// refreshes the preview of the project
-function refreshPreview() {
+// displays a preview of the project 
+// as it was charted
+function previewAsCharted() {
   let hscale = 3;
   let wscale = 3;
   if (pattern.chartType == "S") {
     hscale = 4;
   }
-  var cnvPlain = document.getElementById("cnvPlain");
+  let cnvPlain = document.getElementById("cnvPlain");
   cnvPlain.width = parseInt(pattern.gridColumns, 10) * wscale;
   cnvPlain.height = parseInt(pattern.gridRows, 10) * hscale;
-  var ctx = cnvPlain.getContext("2d");
+  let ctx = cnvPlain.getContext("2d");
   ctx.clearRect(0, 0, cnvPlain.width, cnvPlain.height);
   ctx.lineWidth = hscale;
   for (r = pattern.gridRows; r > 0; r--) {
@@ -927,6 +927,66 @@ function refreshPreview() {
       ctx.stroke();
       ctx.closePath();
     }
+  }
+}
+
+function previewSquare() {
+  let hscale = 2;
+  let wscale = 2;
+  let cnvPlain = document.getElementById("cnvPlain");
+  cnvPlain.width = parseInt(pattern.gridColumns, 10) * wscale;
+  cnvPlain.height = parseInt(pattern.gridColumns, 10) * hscale;
+  let ctx = cnvPlain.getContext("2d");
+  ctx.clearRect(0, 0, cnvPlain.width, cnvPlain.height);
+  ctx.lineWidth = hscale;
+  for (a = 0; a < 360; a = a + 90) {
+    ctx.translate(pattern.gridColumns, pattern.gridColumns);
+    ctx.rotate(a * Math.PI / 180);
+    ctx.translate(0 - pattern.gridColumns, 0 - pattern.gridColumns);
+    for (r = pattern.gridRows; r > 0; r--) {
+      let y = (parseInt(pattern.gridRows, 10) - r) * hscale;
+      for (c = pattern.gridColumns; c > 0; c--) {
+        let td = getCell(r, c);
+        let x = (parseInt(pattern.gridColumns, 10) - c) * wscale;
+        let currColor = td.style.backgroundColor;
+        if (currColor !== colorNoStitch) {
+          if (isReversePreview()) {
+            if (currColor == colorA) {
+              currColor = colorB;
+            }
+            else {
+              if (currColor == colorB) {
+                currColor = colorA;
+              }
+            }
+          }
+          ctx.strokeStyle = currColor;
+          ctx.beginPath();
+          ctx.moveTo(x, y);
+          ctx.lineTo(x + wscale, y);
+          ctx.stroke();
+          ctx.closePath();
+        } 
+      }
+    }
+  }
+}
+
+// when changes are made to the chart
+// refreshes the preview of the project
+function refreshPreview() {
+  switch (previewShape()) {
+    case "":
+      //as charted
+      previewAsCharted();
+      break;
+    case "S":
+      //square
+      previewSquare();
+      break;
+    case "H":
+      //hexagon
+      break;
   }
 }
 
