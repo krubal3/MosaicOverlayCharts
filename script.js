@@ -930,19 +930,27 @@ function previewAsCharted() {
   }
 }
 
+// displays a preview of the project as if
+// worked in the round to form a square
 function previewSquare() {
-  let hscale = 2;
-  let wscale = 2;
+  let hscale = 6;
+  let wscale = 6;
+  if (pattern.chartType == "S") {
+    hscale = 8;
+  }
   let cnvPlain = document.getElementById("cnvPlain");
   cnvPlain.width = parseInt(pattern.gridColumns, 10) * wscale;
   cnvPlain.height = parseInt(pattern.gridColumns, 10) * hscale;
   let ctx = cnvPlain.getContext("2d");
   ctx.clearRect(0, 0, cnvPlain.width, cnvPlain.height);
   ctx.lineWidth = hscale;
+  let transX = pattern.gridColumns * wscale / 2;
+  let transY = pattern.gridColumns * hscale / 2;
   for (a = 0; a < 360; a = a + 90) {
-    ctx.translate(pattern.gridColumns, pattern.gridColumns);
+    
+    ctx.translate(transX, transY);
     ctx.rotate(a * Math.PI / 180);
-    ctx.translate(0 - pattern.gridColumns, 0 - pattern.gridColumns);
+    ctx.translate(0 - transX, 0 - transY);
     for (r = pattern.gridRows; r > 0; r--) {
       let y = (parseInt(pattern.gridRows, 10) - r) * hscale;
       for (c = pattern.gridColumns; c > 0; c--) {
