@@ -5,6 +5,7 @@ body {
 }
 
 #divScroll {
+    clear: left;
     overflow: scroll;
     width:100%;
 }
@@ -33,6 +34,22 @@ td {
     height: 20px;
 }
 
+.section {
+    clear: left;
+}
+
+.sectionTitle {
+    float: left;
+    font-weight: bold;
+    font-size: larger;
+    padding: 3px;
+    width: 120px;
+}
+
+.sectionBody {
+    float: left;
+    padding: 3px;
+}
 
   
   
