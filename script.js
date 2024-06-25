@@ -872,6 +872,40 @@ function isReversePreview() {
   return document.getElementById("chkReversePreview").checked;
 }
 
+// whether or not the tile checkbox is checked above the preview
+// returns true if the checkbox is checked
+// otherwise returns false.
+function isTile() {
+  return document.getElementById("chkTile").checked;
+}
+
+// when the tile checkbox is checked or unchecked
+// refreshes the preview
+function changeTile() {
+  refreshPreview();
+}
+
+// displays a 9x9 grid tiled 
+// based on the preview shape
+function tilePreview() {
+  let cnv = document.getElementById("cnvRepeat");
+  if (isTile()) {
+    cnv.style.display = "";
+    let img = document.getElementById("cnvPlain");
+    cnv.width  = img.width * 3;
+    cnv.height = img.height * 3;
+    var ctx = cnv.getContext("2d");
+    ctx.clearRect(0, 0, cnv.width, cnv.height);
+    let pat = ctx.createPattern(img, "repeat");
+    ctx.rect(0, 0, cnv.width, cnv.height);
+    ctx.fillStyle = pat;
+    ctx.fill();
+  }
+  else {
+    cnv.style.display = "none";
+  }
+}
+
 // when the reverse checkbox is checked or unchecked
 // refreshes the preview to show the correct colors
 function changeReversePreview() {
@@ -1047,6 +1081,7 @@ function refreshPreview() {
       previewHexagon();
       break;
   }
+  tilePreview();
 }
 
 // -- instructions --

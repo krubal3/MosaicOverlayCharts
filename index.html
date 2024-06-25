@@ -107,10 +107,12 @@
         <option value="H">hexagon</option>
       </select>
       <input id="chkReversePreview" type="checkbox" onchange="changeReversePreview();" /> reverse colors
+      <input id="chkTile" type="checkbox" onchange="changeTile();" /> tile
     </div>
   </div>
   <div style="clear: left;">
     <canvas id="cnvPlain" width="31" height="31"></canvas>
+    <canvas id="cnvRepeat" width="31" height="31" style="display: none;"></canvas>
   </div>
   
   <div id="divInstructions" class="section">
