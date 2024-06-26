@@ -41,6 +41,10 @@
       |
       <input id="fleImage" type="file" />
       <button id="btnImportImage" onclick="importImage();">import</button>
+      <select id="selImportImageTo">
+        <option value="">overwrite existing chart</option>
+        <option value="C">import to clipboard</option>
+      </select>
     </div>
   </div>
 
@@ -121,6 +125,10 @@
     </div>
     <div id="divInstructionsBody" class="sectionBody">
       <button id="btnImportInstructions" onclick="importInstructions();">import</button>
+      <select id="selImportInstructionsTo">
+        <option value="">overwrite existing chart</option>
+        <option value="C">import to clipboard</option>
+      </select>
     </div>
   </div>
 

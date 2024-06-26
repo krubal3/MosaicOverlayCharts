@@ -104,44 +104,6 @@ function getIdRange(fromId, toId) {
   }
 }
 
-// -- clear/undo --
-
-// when the clear button is clicked
-// (or one of the import buttons)
-// clears the chart
-function clearChart() {
-  let ret = false;
-  if (confirm("Previous design will be cleared.  Okay to continue?")) {
-    for (r = pattern.gridRows; r > 0; r--) {
-      for (c = pattern.gridColumns; c > 0; c--) {
-        let td = getCell(r, c);
-        td.style.backgroundColor = colorA;
-      }
-    }
-    savePattern();
-    loadChart();
-    refreshPreview();
-    writeInstructions();
-    ret = true;
-  }
-  return ret;
-}
-
-// when the undo button is clicked
-// undoes the last action
-function undo() {
-  if (localStorage.getItem("patternUndo") !== null) {
-    let patternUndo = JSON.parse(localStorage.getItem("patternUndo"));
-    localStorage.setItem("patternUndo", JSON.stringify(pattern));
-    localStorage.setItem("pattern", JSON.stringify(patternUndo));
-    restorePattern();
-    loadChart();
-    refreshPreview();
-    writeInstructions();
-  }
-}
-
-
 // -- setup chart --
 
 // changes the type of chart displayed
@@ -203,12 +165,20 @@ function changeMode() {
 
 // -- import image --
 
+// where the image should be imported to
+// returns the destination currently selected in the dropdown
+// empty string - overwrite the existing chart
+// C - import to clipboard
+function importImageTo() {
+  return document.getElementById("selImportImageTo").value;
+}
+
 // when the import button in the import image section is clicked
 // imports the currently selected image
 // to fit in the specified number of rows or columns
 // clearing and resizing the chart based on the image
 function importImage() {
-  if (clearChart()) {
+  if (importImageTo() !== "" || clearChart()) {
     let fitType = document.getElementById("selFitType").value;
     let fitNumber = document.getElementById("txtFitNumber").value;
     let cnvPlain = document.getElementById("cnvPlain");
@@ -236,12 +206,19 @@ function importImage() {
     ctx.drawImage(imgImport, 0, 0);
 
     let imageData = ctx.getImageData(0, 0, cnvPlain.width, cnvPlain.height);
-    pattern.gridColumns = cnvPlain.width;
-    pattern.gridRows = cnvPlain.height;
-    loadChart();
+    let imgColumns = cnvPlain.width;
+    let imgRows = cnvPlain.height;
 
-    for (r = pattern.gridRows - 1; r > -1; r--) {
-      for (c = pattern.gridColumns - 1; c > -1; c--) {
+    if (importImageTo() == "") {
+      pattern.gridColumns = imgColumns;
+      pattern.gridRows = imgRows;
+      loadChart();
+    }
+
+    let arrCells = new Array();
+    
+    for (r = imgRows - 1; r > -1; r--) {
+      for (c = imgColumns - 1; c > -1; c--) {
 
         let redComp = imageData.data[((r * (cnvPlain.width * 4)) + (c * 4))];
         let greenComp = imageData.data[((r * (cnvPlain.width * 4)) + (c * 4)) + 1];
@@ -250,22 +227,92 @@ function importImage() {
         let avg = (redComp + greenComp + blueComp) / 3
 
         if (trans > 0 && avg < 200) {
-          let currR = pattern.gridRows - r;
-          let currC = pattern.gridColumns - c;
-          placePoint(currR, currC, colorB);
+          let currR = imgRows - r;
+          let currC = imgColumns - c;
+          if (importImageTo() == "") {
+            placePoint(currR, currC, colorB);
+          }
+          else {
+            let cell = {
+              row: currR,
+              column: currC,
+              color: colorB
+            }
+            arrCells.push(cell);
+            if (currR % 2 !== 0) {
+              cell = {
+                row: currR - 1,
+                column: currC,
+                color: colorB
+              }
+              arrCells.push(cell);
+              cell = {
+                row: currR + 1,
+                column: currC,
+                color: colorB
+              }
+              arrCells.push(cell);
+            }
+          }
         }
       }
     }
-    addXs();
+    if (importImageTo() == "") {
+      addXs();
+      savePattern();
+      restorePattern();
+      loadChart();
+      refreshPreview();
+      writeInstructions();
+    }
+    else {
+      refreshPreview();
+      document.getElementById("selMode").value = "S";
+      arrCells.sort((a,b) => b.column - a.column);
+      arrCells.sort((a,b) => b.row - a.row);
+
+      selection.cells = arrCells;
+      alert("Imported to clipboard.");
+    }
+  }
+}
+
+// -- edit chart --
+
+// when the clear button is clicked
+// (or one of the import buttons)
+// clears the chart
+function clearChart() {
+  let ret = false;
+  if (confirm("Previous design will be cleared.  Okay to continue?")) {
+    for (r = pattern.gridRows; r > 0; r--) {
+      for (c = pattern.gridColumns; c > 0; c--) {
+        let td = getCell(r, c);
+        td.style.backgroundColor = colorA;
+      }
+    }
     savePattern();
+    loadChart();
+    refreshPreview();
+    writeInstructions();
+    ret = true;
+  }
+  return ret;
+}
+
+// when the undo button is clicked
+// undoes the last action
+function undo() {
+  if (localStorage.getItem("patternUndo") !== null) {
+    let patternUndo = JSON.parse(localStorage.getItem("patternUndo"));
+    localStorage.setItem("patternUndo", JSON.stringify(pattern));
+    localStorage.setItem("pattern", JSON.stringify(patternUndo));
     restorePattern();
     loadChart();
     refreshPreview();
     writeInstructions();
   }
 }
-
-// -- edit chart --
 
 // when the chart mode is select and a cell is clicked
 // if no cells are currently displayed as selected, the clicked cell begins a new selection
@@ -556,8 +603,8 @@ function getEdgeColumns(row) {
 // resets the border color for any selected cells
 function hideSelection() {
   let idRange = getIdRange(selection.fromId, selection.toId);
-  for (r = idRange.minR; r <= idRange.maxR; r++) {
-    for (c = idRange.minC; c <= idRange.maxC; c++) {
+  for (r = 1; r <= pattern.gridRows; r++) {
+    for (c = 1; c <= pattern.gridColumns; c++) {
       let td = getCell(r, c);
       td.style.borderColor = "";
     }
@@ -768,8 +815,7 @@ function selectCutCopy(selCutCopy) {
         }
         arrCells.push(cell);
         if (selCutCopy.value == "cut") {
-          placePoint(r, c, colorA);
-          //gridTd.style.backgroundColor = colorA;
+          gridTd.style.backgroundColor = colorA;
         }
       }
     }
@@ -803,10 +849,16 @@ function selectCutCopy(selCutCopy) {
 // and the pasted cells are flipped vertically
 function selectPaste(selPaste) {
   let idRange = getIdRange(selection.fromId, selection.toId);
-  let rowOffset = idRange.maxR - selection.cells[0].row;
-  let colOffset = idRange.maxC - selection.cells[0].column;
-  let fromWidth = selection.cells[0].column - selection.cells[selection.cells.length - 1].column;
-  let fromHeight = selection.cells[0].row - selection.cells[selection.cells.length - 1].row;
+  selection.cells.sort((a,b) => a.row - b.row);
+  let minCellRow = selection.cells[0].row;
+  let maxCellRow = selection.cells[selection.cells.length - 1].row;
+  selection.cells.sort((a,b) => a.column - b.column);
+  let minCellColumn = selection.cells[0].column;
+  let maxCellColumn = selection.cells[selection.cells.length - 1].column;
+  let rowOffset = idRange.maxR - maxCellRow;
+  let colOffset = idRange.maxC - maxCellColumn;
+  let fromWidth = maxCellColumn - minCellColumn;
+  let fromHeight = maxCellRow - minCellRow;
   let toWidth = idRange.maxC - idRange.minC + 1;
   let toHeight = idRange.maxR - idRange.minR + 1;
   if (selPaste.value == "center") {
