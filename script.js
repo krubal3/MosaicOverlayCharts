@@ -888,21 +888,41 @@ function changeTile() {
 // displays a 9x9 grid tiled 
 // based on the preview shape
 function tilePreview() {
+  let cnvPlain = document.getElementById("cnvPlain");
   let cnv = document.getElementById("cnvRepeat");
   if (isTile()) {
+    cnvPlain.style.display = "none";
     cnv.style.display = "";
     let img = document.getElementById("cnvPlain");
     cnv.width  = img.width * 3;
     cnv.height = img.height * 3;
-    var ctx = cnv.getContext("2d");
+    let ctx = cnv.getContext("2d");
     ctx.clearRect(0, 0, cnv.width, cnv.height);
-    let pat = ctx.createPattern(img, "repeat");
-    ctx.rect(0, 0, cnv.width, cnv.height);
-    ctx.fillStyle = pat;
-    ctx.fill();
+    if (previewShape() !== "H") {
+      let pat = ctx.createPattern(img, "repeat");
+      ctx.rect(0, 0, cnv.width, cnv.height);
+      ctx.fillStyle = pat;
+      ctx.fill();
+    }
+    else {
+      let imgW = img.width/2;
+      let imgH = img.height/2;
+      cnv.width  = imgW * 2.5;
+      cnv.height = imgH * 3.5;
+      ctx.drawImage(img, 0, 0, imgW, imgH);
+      ctx.drawImage(img, 0, imgH, imgW, imgH);
+      ctx.drawImage(img, 0, imgH * 2, imgW, imgH);
+      ctx.drawImage(img, imgW * 0.75, imgH * 0.5, imgW, imgH);
+      ctx.drawImage(img, imgW * 0.75, imgH * 1.5, imgW, imgH);
+      ctx.drawImage(img, imgW * 0.75, imgH * 2.5, imgW, imgH);
+      ctx.drawImage(img, imgW * 1.5, 0, imgW, imgH);
+      ctx.drawImage(img, imgW * 1.5, imgH, imgW, imgH);
+      ctx.drawImage(img, imgW * 1.5, imgH * 2, imgW, imgH);
+    }
   }
   else {
     cnv.style.display = "none";
+    cnvPlain.style.display = "";
   }
 }
 
