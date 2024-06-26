@@ -457,15 +457,13 @@ function clickCell(td) {
 // because to get that color on that row and overlay stitch is required
 function toggleCell(td) {
   let id = splitId(td.id);
-  let r = id.row;
-  let c = id.column;
   if (td.style.backgroundColor !== colorNoStitch && !isShaping()) {
-    if (r > 1 && r < pattern.gridRows && c > 1 && c < pattern.gridColumns) {
+    if (id.row >= 1 && id.row <= pattern.gridRows && id.column >= 1 && id.column <= pattern.gridColumns) {
       if (td.style.backgroundColor == colorB) {
-        placePoint(r, c, colorA);
+        placePoint(id.row, id.column, colorA);
       }
       else {
-        placePoint(r, c, colorB);
+        placePoint(id.row, id.column, colorB);
       }
     }
   }
@@ -589,7 +587,7 @@ function placePoint(row, column, setColor) {
       td.style.backgroundColor = setColor;
     }
     if (setColor !== colorNoStitch) {
-      if ((setColor == colorA && r % 2 == 0) || (setColor == colorB && r % 2 !== 0)) {
+      if ((setColor == colorA && row % 2 == 0) || (setColor == colorB && row % 2 !== 0)) {
         td = getCell(row - 1, column);
         if (td !== null && td.style.backgroundColor !== colorNoStitch) {
           td.style.backgroundColor = setColor;
