@@ -1169,9 +1169,6 @@ function refreshPreview() {
 // arrGrid - temporary grid in memory
 // used when importing from instructions
 function addCellToGrid(row, column, color, arrGrid) {
-  // if (arrGrid.find((cell) => cell.row == row && cell.column == column)) {
-  //   alert(JSON.stringify(arrGrid));
-  // }
   let cell = {
     row: row,
     column: column,
@@ -1262,9 +1259,9 @@ function splitStitchText(stitchText) {
 // arrRow - array of instructions for each row
 // returns:
 // array of row and startColumn
-function readShaping(arrRow) {
+function readShaping(importGridRows, arrRow) {
   let arrRowStarts = new Array();
-  for (r = 1; r <= pattern.gridRows; r++) {
+  for (r = 1; r <= importGridRows; r++) {
     let rowText = arrRow[r].split(":")[1];
     let arrStitchText = rowText.split(",");
     if (arrRow[r].indexOf("WS") > -1) {
@@ -1311,7 +1308,7 @@ function readShaping(arrRow) {
 // arrRowStarts - array of row and startColumn for the row
 // arrGrid - temporary grid in memory to work into
 function workRows(arrRow, arrRowStarts, arrGrid) {
-  for (r = 1; r <= pattern.gridRows; r++) {
+  for (r = 1; r <= arrRow.length - 1; r++) {
     let rowColor = colorA;
     if (r % 2 == 0) {
       rowColor = colorB;
@@ -1320,7 +1317,6 @@ function workRows(arrRow, arrRowStarts, arrGrid) {
     for (i = 1; i < startColumn; i++) {
       addCellToGrid(r, i, colorNoStitch, arrGrid);
     }
-    //alert(arrRow[r]);
     let rowText = arrRow[r].split(":")[1];
     let arrStitchText = rowText.split(",");
     if (arrRow[r].indexOf("WS") > -1) {
@@ -1376,36 +1372,80 @@ function workRows(arrRow, arrRowStarts, arrGrid) {
   }
 }
 
+// where the instructions should be imported to
+// returns the destination currently selected in the dropdown
+// empty string - overwrite the existing chart
+// C - import to clipboard
+function importInstructionsTo() {
+  return document.getElementById("selImportInstructionsTo").value;
+}
+
+// reset the edge columns in the specified array of cells to colorA
+// arrGrid - array of cells (with row, column, and color properties)
+// maxGridRows - maximum row number of a cell in the array
+// maxGridColumns - maximum column number of a cell in the array
+// used when importing instructions to the clipboard to avoid pasting edge stitches
+function resetEdgeColumnsInArray(arrGrid, maxGridRows, maxGridColumns) {
+  for (r = 1; r <= maxGridRows; r++) {
+    for (c = 1; c <= maxGridColumns; c++) {
+      let cell = arrGrid.find((cell) => cell.row == r && cell.column == c);
+      if (cell !== undefined && cell.color !== colorNoStitch) {
+        cell.color = colorA;
+        break;
+      }
+    }
+    for (c = maxGridColumns; c >= 1; c--) {
+      let cell = arrGrid.find((cell) => cell.row == r && cell.column == c);
+      if (cell !== undefined && cell.color !== colorNoStitch) {
+        cell.color = colorA;
+        break;
+      }
+    }
+  }
+}
+
 // when the import button in the instructions section is clicked,
 // imports the instructions entered in the instructions text area
 function importInstructions() {
   let instructions = document.getElementById("txtInstructions").value;
-  if (clearChart()) {
+  if (importInstructionsTo() !== "" || clearChart()) {
     instructions = expandInstructionTimes(instructions);
     let arrRow = instructions.split("row ");
-    pattern.gridRows = arrRow.length - 1;
-    pattern.gridColumns = 1;
-    let arrRowStarts = readShaping(arrRow);
+    let importGridRows = arrRow.length - 1;
+    let importGridColumns = 1;
+    let arrRowStarts = readShaping(importGridRows, arrRow);
     let arrGrid = new Array();
     workRows(arrRow, arrRowStarts, arrGrid);
     if (arrGrid.length > 0) {
       arrGrid.sort((a,b) => b.column - a.column);
-      pattern.gridColumns = arrGrid[0].column;
+      importGridColumns = arrGrid[0].column;
     }  
     arrGrid.sort((a,b) => a.column - b.column);
     arrGrid.sort((a,b) => a.row - b.row);
-    loadChart();
-    for (i = 0; i < arrGrid.length; i++) {
-      let td = getCell(arrGrid[i].row, arrGrid[i].column);
-      td.style.backgroundColor = arrGrid[i].color;
+    if (importInstructionsTo() == "") {
+      pattern.gridRows = importGridRows;
+      pattern.gridColumns = importGridColumns;
+      loadChart();
+      for (i = 0; i < arrGrid.length; i++) {
+        let td = getCell(arrGrid[i].row, arrGrid[i].column);
+        td.style.backgroundColor = arrGrid[i].color;
+      }
+      addXs();
+      savePattern();
+      restorePattern();
+      loadChart();
+      refreshPreview();
+      writeInstructions();
+      alert("Imported");
     }
-    addXs();
-    savePattern();
-    restorePattern();
-    loadChart();
-    refreshPreview();
-    writeInstructions();
-    alert("Imported");
+    else {
+      resetEdgeColumnsInArray(arrGrid, importGridRows, importGridColumns);
+      document.getElementById("selMode").value = "S";
+      arrGrid.sort((a,b) => b.column - a.column);
+      arrGrid.sort((a,b) => b.row - a.row);
+      selection.cells = arrGrid;
+      alert("Imported to clipboard.");
+    }
   }
 }
 
