@@ -76,12 +76,12 @@ function getIdRange(fromId, toId) {
     maxR = fromIds.row;
     minR = toIds.row;
   }
-  // if (maxR % 2 !== 0) {
-  //   maxR = maxR - 1;
-  // }
-  // if (minR % 2 !== 0) {
-  //   minR = minR - 1;
-  // }
+  if (maxR % 2 !== 0) {
+    maxR = maxR - 1;
+  }
+  if (minR % 2 !== 0) {
+    minR = minR - 1;
+  }
   if (minR < 1) {
     minR = 1;
   }
@@ -583,19 +583,25 @@ function clearSelection() {
 function placePoint(row, column, setColor) {
   let td = getCell(row, column);
   if (td !== null) {
-    if (td.style.backgroundColor !== colorNoStitch || isShaping()) {
-      td.style.backgroundColor = setColor;
-    }
     if (setColor !== colorNoStitch) {
       if ((setColor == colorA && row % 2 == 0) || (setColor == colorB && row % 2 !== 0)) {
-        td = getCell(row - 1, column);
-        if (td !== null && td.style.backgroundColor !== colorNoStitch) {
+        let tdAbove = getCell(row + 1, column);
+        let tdBelow = getCell(row - 1, column);
+        if (tdAbove !== null && tdBelow !== null && tdAbove.style.backgroundColor !== colorNoStitch) {
+          tdAbove.style.backgroundColor = setColor;
           td.style.backgroundColor = setColor;
+          if (tdBelow.style.backgroundColor !== colorNoStitch) {
+            tdBelow.style.backgroundColor = setColor;
+          }
         }
-        td = getCell(row + 1, column);
-        if (td !== null && td.style.backgroundColor !== colorNoStitch) {
-          td.style.backgroundColor = setColor;
-        }
+      }
+      else {
+        td.style.backgroundColor = setColor;
+      }
+    }
+    else {
+      if (isShaping()) {
+        td.style.backgroundColor = setColor;
       }
     }
   }
