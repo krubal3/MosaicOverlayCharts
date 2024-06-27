@@ -344,8 +344,8 @@ function selectCell(td) {
     let rect = td.getBoundingClientRect(); 
     let divSelectionMenu = document.getElementById("divSelectionMenu");
     divSelectionMenu.style.display = "";
-    divSelectionMenu.style.left = rect.left + "px";
-    divSelectionMenu.style.top = rect.top + "px";
+    divSelectionMenu.style.left = Math.round(rect.left + window.scrollX) + "px";
+    divSelectionMenu.style.top = Math.round(rect.top + window.scrollY) + "px";
     let selPaste = document.getElementById("selPaste");
     if (selection.cells.length > 0) {
       selPaste.style.display = "";
