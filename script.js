@@ -76,16 +76,17 @@ function getIdRange(fromId, toId) {
     maxR = fromIds.row;
     minR = toIds.row;
   }
-  if (maxR % 2 !== 0) {
-    maxR = maxR - 1;
+  if (!isShaping()) {
+    if (maxR % 2 !== 0) {
+      maxR = maxR - 1;
+    }
+    if (minR % 2 !== 0) {
+      minR = minR - 1;
+    }
+    if (minR < 1) {
+      minR = 1;
+    }
   }
-  if (minR % 2 !== 0) {
-    minR = minR - 1;
-  }
-  if (minR < 1) {
-    minR = 1;
-  }
-
   let maxC = toIds.column;
   let minC = fromIds.column;
   if (parseInt(maxC, 10) < parseInt(minC, 10)) {
@@ -321,6 +322,8 @@ function undo() {
 // if there is a selection stored in the "clipboard", paste options are included
 function selectCell(td) {
   if (selection.fromId == "") {
+    let idRange = getIdRange(td.id, td.id);
+    td = getCell(idRange.minR, idRange.minC);
     selection.fromId = td.id;
     td.style.borderColor = "red";
   }
@@ -338,8 +341,11 @@ function selectCell(td) {
       }
     }
 
+    let rect = td.getBoundingClientRect(); 
     let divSelectionMenu = document.getElementById("divSelectionMenu");
     divSelectionMenu.style.display = "";
+    divSelectionMenu.style.left = rect.left + "px";
+    divSelectionMenu.style.top = rect.top + "px";
     let selPaste = document.getElementById("selPaste");
     if (selection.cells.length > 0) {
       selPaste.style.display = "";
