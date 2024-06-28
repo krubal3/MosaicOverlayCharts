@@ -192,9 +192,10 @@
     <div id="divPaste" style="display: none;">
       <select id="selPaste" onchange="selectPaste(this);">
         <option value="">-- paste --</option>
-        <option value="leftTop">paste left top</option>
-        <option value="center">paste center</option>
-        <option value="fill">paste fill</option>
+        <option value="leftTop">left/top</option>
+        <option value="botRight">bottom/right</option>
+        <option value="center">center</option>
+        <option value="fill">fill</option>
         <option value="flipH">flip horizontal</option>
         <option value="flipV">flip vertical</option>
       </select>
@@ -204,9 +205,10 @@
         When a paste option is selected from the dropdown<br />
         the cells saved in the clipboard are pasted into the currently selected cells <br />
         based on the paste option selected:<br />
-        paste left top - the left/top of the pasted cells match the left/top of the currently selected cells<br />
-        paste center - the center of the pasted cells match the center of the currently selected cells<br />
-        paste fill - the left/top of the pasted cells match the left/top of the currently selected cells
+        left/top - the left/top of the pasted cells match the left/top of the currently selected cells<br />
+        bottom/right - the bottom/right of the pasted cells match the bottom/right of the currently selected cells<br />
+        center - the center of the pasted cells match the center of the currently selected cells<br />
+        fill - the left/top of the pasted cells match the left/top of the currently selected cells
         and the pasted cells repeat horizontally and vertically to fill the currently selected cells<br />
         flip horizontal - the left/top of the pasted cells match the left/top of the currently selected cells
         and the pasted cells are flipped horizontally<br />

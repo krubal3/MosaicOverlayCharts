@@ -850,7 +850,6 @@ function selectCutCopy(selCutCopy) {
 // when the cancel button is clicked in the selection menu
 // the current selection is cancelled.
 function cancelSelection() {
-  alert("here");
   selection.fromId = "";
   selection.toId = "";
   hideSelection();
@@ -863,6 +862,7 @@ function cancelSelection() {
 // are pasted into the currently selected cells
 // based on the paste option selected:
 // leftTop - the left/top of the pasted cells match the left/top of the currently selected cells
+// botRight - the bottom/right of the pasted cells match the bottom/right of the currently selected cells
 // center - the center of the pasted cells match the center of the currently selected cells
 // fill - the left/top of the pasted cells match the left/top of the currently selected cells 
 // and the pasted cells repeat to fill the currently selected cells
@@ -889,6 +889,10 @@ function selectPaste(selPaste) {
     rowOffset = rowOffset + Math.round(fromHeight / 2)
     colOffset = colOffset - Math.round(toWidth / 2);
     colOffset = colOffset + Math.round(fromWidth / 2);
+  }
+  if (selPaste.value == "botRight") {
+    rowOffset = idRange.minR - minCellRow;
+    colOffset = idRange.minC - minCellColumn;
   }
   if (rowOffset % 2 !== 0) {
     rowOffset = rowOffset + 1;
