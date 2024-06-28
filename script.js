@@ -556,11 +556,7 @@ function addXs() {
     for (c = pattern.gridColumns; c >= 1; c--) {
       let td = getCell(r, c);
       td.innerHTML = plain;
-      let rBelow = parseInt(r, 10) - 1;
-      let tdBelow = getCell(rBelow, c);
-      let color = td.style.backgroundColor;
-      let colorBelow = tdBelow.style.backgroundColor;
-      if (c == edgeColumns.first || c == edgeColumns.last) {
+      if (c == edgeColumns.first || c == edgeColumns.last || r == 1 || r == pattern.gridRows) {
         if (r % 2 == 0) {
           td.style.backgroundColor = colorB;
         }
@@ -568,17 +564,19 @@ function addXs() {
           td.style.backgroundColor = colorA;
         }
       }
-      else {
-        if (c > edgeColumns.first && c < edgeColumns.last) {
-          if (r % 2 == 0) {
-            if (color == colorB && colorBelow == colorB) {
-              td.innerHTML = overlay;
-            }
+      let rBelow = parseInt(r, 10) - 1;
+      let tdBelow = getCell(rBelow, c);
+      let color = td.style.backgroundColor;
+      let colorBelow = tdBelow.style.backgroundColor;
+      if (c > edgeColumns.first && c < edgeColumns.last) {
+        if (r % 2 == 0) {
+          if (color == colorB && colorBelow == colorB) {
+            td.innerHTML = overlay;
           }
-          else {
-            if (color == colorA && colorBelow == colorA) {
-              td.innerHTML = overlay;
-            }
+        }
+        else {
+          if (color == colorA && colorBelow == colorA) {
+            td.innerHTML = overlay;
           }
         }
       }
@@ -1276,9 +1274,9 @@ function splitStitchText(stitchText) {
 // arrRow - array of instructions for each row
 // returns:
 // array of row and startColumn
-function readShaping(importGridRows, arrRow) {
+function readShaping(arrRow) {
   let arrRowStarts = new Array();
-  for (r = 1; r <= importGridRows; r++) {
+  for (r = 1; r <= arrRow.length - 1; r++) {
     let rowText = arrRow[r].split(":")[1];
     let arrStitchText = rowText.split(",");
     if (arrRow[r].indexOf("WS") > -1) {
@@ -1430,7 +1428,7 @@ function importInstructions() {
     let arrRow = instructions.split("row ");
     let importGridRows = arrRow.length - 1;
     let importGridColumns = 1;
-    let arrRowStarts = readShaping(importGridRows, arrRow);
+    let arrRowStarts = readShaping(arrRow);
     let arrGrid = new Array();
     workRows(arrRow, arrRowStarts, arrGrid);
     if (arrGrid.length > 0) {
