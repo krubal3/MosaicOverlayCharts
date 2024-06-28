@@ -357,12 +357,12 @@ function selectCell(td) {
     divSelectionMenu.style.display = "";
     divSelectionMenu.style.left = Math.round(rect.left + window.scrollX) + "px";
     divSelectionMenu.style.top = Math.round(rect.top + window.scrollY) + "px";
-    let selPaste = document.getElementById("selPaste");
+    let divPaste = document.getElementById("divPaste");
     if (selection.cells.length > 0) {
-      selPaste.style.display = "";
+      divPaste.style.display = "";
     }
     else {
-      selPaste.style.display = "none";
+      divPaste.style.display = "none";
     }
   }
 }
@@ -812,7 +812,7 @@ function selectShape(selShape) {
 }
 
 // when a cut/copy option is selected from the dropdown
-// if an option other than cancel is selected, the currently selected cells are saved to the global selection object
+// the currently selected cells are saved to the global selection object
 // if cut is selected, the currently selected cells are reset to colorA
 function selectCutCopy(selCutCopy) {
   let idRange = getIdRange(selection.fromId, selection.toId);
@@ -822,7 +822,7 @@ function selectCutCopy(selCutCopy) {
     for (c = pattern.gridColumns - 1; c > 1; c--) {
       let gridTd = getCell(r, c);
       gridTd.style.borderColor = "";
-      if (selCutCopy.value !== "cancel" && r >= idRange.minR && r <= idRange.maxR && c >= idRange.minC && c <= idRange.maxC) {
+      if (r >= idRange.minR && r <= idRange.maxR && c >= idRange.minC && c <= idRange.maxC) {
         let cell = {
           row: r,
           column: c,
@@ -835,10 +835,7 @@ function selectCutCopy(selCutCopy) {
       }
     }
   }
-  if (selCutCopy.value !== "cancel") {
-    selection.cells = arrCells;
-  }
-
+  selection.cells = arrCells;
   selection.fromId = "";
   selection.toId = "";
   selCutCopy.value = "";
@@ -848,6 +845,17 @@ function selectCutCopy(selCutCopy) {
   refreshPreview();
   writeInstructions();
   savePattern();
+}
+
+// when the cancel button is clicked in the selection menu
+// the current selection is cancelled.
+function cancelSelection() {
+  alert("here");
+  selection.fromId = "";
+  selection.toId = "";
+  hideSelection();
+  let divSelectionMenu = document.getElementById("divSelectionMenu");
+  divSelectionMenu.style.display = "none";
 }
 
 // when a paste option is selected from the dropdown

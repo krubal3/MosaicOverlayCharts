@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width" />
   <title>Mosaic Overlay Charts</title>
   <link rel="stylesheet" href="style.css" />
 </head>
+
 <body>
   <div id="divSetupChart" class="section">
     <div id="divSetupChartTitle" class="sectionTitle">
@@ -20,29 +22,37 @@
       </select>
       <button id="btnHelpChartType" onclick="showHelp(this);">?</button>
       <div id="divHelpChartType" class="help" style="display: none;">
+        <button id="btxHelpChartType" style="float: right;" onclick="showHelp(this);">X</button>
         Select the type of chart to display:<br />
         garter - knit in garter stitch (back and forth or in the round)<br />
         stockinette - knit in stockinette stitch (back and forth or in the round)<br />
         crochet (RS only) - crocheted working on the right side of the work only (no turning)<br />
         crochet (back and forth) - crocheted working back and forth, turning the work every two rows<br />
       </div>
-      |
-      grid columns: 
-      <input id="txtGridColumns" type="number" value="31" min="1" max="999" size="3" onchange="changeGridColumns(this.value);" />
+      grid columns:
+      <input id="txtGridColumns" type="number" value="31" min="1" max="999" size="3"
+        onchange="changeGridColumns(this.value);" />
       <button id="btnHelpGridColumns" onclick="showHelp(this);">?</button>
       <div id="divHelpGridColumns" class="help" style="display: none;">
-        Enter the number of columns to include in the grid for the chart and click [ok].  Each column represents a stitch.
+        <button id="btxHelpGridColumns" style="float: right;" onclick="showHelp(this);">X</button>
+        Enter the number of columns to include in the grid for the chart and click [ok]. Each column represents a
+        stitch.
       </div>
-      grid rows: 
-      <input id="txtGridRows" type="number" value="31" min="1" max="999" size="3" onchange="changeGridRows(this.value);" />
+      grid rows:
+      <input id="txtGridRows" type="number" value="31" min="1" max="999" size="3"
+        onchange="changeGridRows(this.value);" />
       <button id="btnHelpGridRows" onclick="showHelp(this);">?</button>
       <div id="divHelpGridRows" class="help" style="display: none;">
-        Enter the number of rows to include in the grid for the chart and click [ok].  
+        <button id="btxHelpGridRows" style="float: right;" onclick="showHelp(this);">X</button>
+        Enter the number of rows to include in the grid for the chart and click [ok].
         Each row represents a row of knitting or crochet.<br />
         For garter and stockinette, only the odd rows are shown in the grid.<br />
-        For garter, if working back and forth, all even rows are knit across on the wrong side.  If working in the round, all even rows are purled across on the right side.<br />
-        For stockinette, if working back and forth, all even rows are purled across on the wrong side.   If working in the round, all even rows are knit across on the right side.<br />
-        For crochet, all rows are shown in the chart.  Right side rows are numbered on the right and wrong side rows are numbered on the left.
+        For garter, if working back and forth, all even rows are knit across on the wrong side. If working in the round,
+        all even rows are purled across on the right side.<br />
+        For stockinette, if working back and forth, all even rows are purled across on the wrong side. If working in the
+        round, all even rows are knit across on the right side.<br />
+        For crochet, all rows are shown in the chart. Right side rows are numbered on the right and wrong side rows are
+        numbered on the left.
       </div>
       <button>ok</button>
     </div>
@@ -61,19 +71,30 @@
       </select>
       <button id="btnHelpFitType" onclick="showHelp(this);">?</button>
       <div id="divHelpFitType" class="help" style="display: none;">
-        Enter the number of rows or columns to fit the image inside of and select whether the number is the number of rows or columns.
+        <button id="btxHelpFitType" style="float: right;" onclick="showHelp(this);">X</button>
+        Enter the number of rows or columns to fit the image inside of and select whether the number is the number of
+        rows or the number of columns.
       </div>
-      |
       <input id="fleImage" type="file" />
       <button id="btnHelpImage" onclick="showHelp(this);">?</button>
       <div id="divHelpImage" class="help" style="display: none;">
-        Select the file that contains the image to import.  Select a simple, high contrast image in jpg, png, or gif format.
+        <button id="btxHelpImage" style="float: right;" onclick="showHelp(this);">X</button>
+        Select the file that contains the image to import. Select a simple, high contrast image in jpg, png, or gif
+        format.
       </div>
       <button id="btnImportImage" onclick="importImage();">import</button>
       <select id="selImportImageTo">
         <option value="">overwrite existing chart</option>
         <option value="C">import to clipboard</option>
       </select>
+      <button id="btnHelpImportImage" onclick="showHelp(this);">?</button>
+      <div id="divHelpImportImage" class="help" style="display: none;">
+        <button id="btxHelpImportImage" style="float: right;" onclick="showHelp(this);">X</button>
+        Click [import] to import the image. The image will overwrite the existing chart, by default.<br />
+        Select "import to clipboard" to leave the existing chart in place and import the image to the clipboard.<br />
+        Once the "imported" message appears, select an area on the chart and choose a paste option to place the imported image
+        onto the existing chart.<br />
+      </div>
     </div>
   </div>
 
@@ -88,15 +109,51 @@
         <option value="S">select</option>
         <option value="F">fill</option>
       </select>
+      <button id="btnHelpMode" onclick="showHelp(this);">?</button>
+      <div id="divHelpMode" class="help" style="display: none;">
+        <button id="btxHelpMode" style="float: right;" onclick="showHelp(this);">X</button>
+        Select the editing mode.<br />
+        toggle - clicking on a stitch in the chart, toggles the stitch between colorA and colorB. If "shaping" is
+        checked, the stitch toggles between colorA and "no stitch".<br />
+        select - if there is no current selection, clicking on a stitch begins a selection, otherwise, clicking on a
+        stitch changes the end of the range of selected stitches and displays the selection menu.<br />
+        fill - clicking on a stitch fills the area that includes the stitch with the opposite color. When filling colorB
+        with colorA, the edges of the area are left in colorB.
+      </div>
       <input id="chkShaping" type="checkbox" />shaping
-      |
+      <button id="btnHelpShaping" onclick="showHelp(this);">?</button>
+      <div id="divHelpShaping" class="help" style="display: none;">
+        <button id="btxHelpShaping" style="float: right;" onclick="showHelp(this);">X</button>
+        Checking this checkbox allows shaping to be defined in the chart by setting a stitch to "no stitch" to designate
+        an increase or decrease.<br />
+        An increase will have a "no stitch" below it and a decrease will have a "no stitch" above it.
+      </div>
       <button id="btnUndo" onclick="undo();">undo</button>
-      |
+      <button id="btnHelpUndo" onclick="showHelp(this);">?</button>
+      <div id="divHelpUndo" class="help" style="display: none;">
+        <button id="btxHelpUndo" style="float: right;" onclick="showHelp(this);">X</button>
+        Undoes the last action. Only the most recent action can be undone.
+      </div>
       <button id="btnClearChart" onclick="clearChart();">clear</button>
+      <button id="btnHelpClear" onclick="showHelp(this);">?</button>
+      <div id="divHelpClear" class="help" style="display: none;">
+        <button id="btxHelpClear" style="float: right;" onclick="showHelp(this);">X</button>
+        Clears the chart, resetting the color of all the stitches to colorA where possible. <br />
+        The edge stitches on even rows must be colorB. <br />
+        If the chart contains an even number of rows, the final row must be colorB.
+      </div>
     </div>
   </div>
-  
-  <div id="divSelectionMenu" style="display: none; background-color: white; position: absolute; top: 200px; left: 200px; ">
+
+  <div id="divSelectionMenu"
+    style="display: none; background-color: white; position: absolute; top: 200px; left: 200px; ">
+    <button id="btnCancel" onclick="cancelSelection();">cancel</button>
+    <button id="btnHelpCancel" onclick="showHelp(this);">?</button>
+    <div id="divHelpCancel" class="help" style="display: none;">
+      <button id="btxHelpCancel" style="float: right;" onclick="showHelp(this);">X</button>
+      Cancels the current selection and allows a new selection to be started.
+    </div>
+    <br />
     <select id="selShape" onchange="selectShape(this);">
       <option value="">-- shape --</option>
       <option value="|">line |</option>
@@ -106,22 +163,57 @@
       <option value="R">rectangle</option>
       <option value="C">circle</option>
     </select>
+    <button id="btnHelpShape" onclick="showHelp(this);">?</button>
+    <div id="divHelpShape" class="help" style="display: none;">
+      <button id="btxHelpShape" style="float: right;" onclick="showHelp(this);">X</button>
+      Draws the specified shape within the currently selected range in colorB.<br />
+      If "shaping" is checked, draws the shape in "no stitches".<br />
+      line | - draws a vertical line along the left edge of the selected range.<br />
+      line _ - draws a horizontal line along the bottom edge of the selected range.<br />
+      line / - draws a right leaning diagonal line across the selected range.<br />
+      line \ - draws a left leaning diagonal line across the selected range.<br />
+      rectangle - draws a rectangle the size of the selected range.<br />
+      circle - draws a circle in the center of the selected range, sized to fit the range.<br />
+    </div>
     <br />
-    <select id="selCutCopy" onchange="selectCutCopy(this);" >
+    <select id="selCutCopy" onchange="selectCutCopy(this);">
       <option value="">-- cut/copy --</option>
       <option value="cut">cut</option>
       <option value="copy">copy</option>
-      <option value="cancel">cancel</option>
     </select>
-    <br/>
-    <select id="selPaste" onchange="selectPaste(this);" style="display: none;">
-      <option value="">-- paste --</option>
-      <option value="leftTop">paste left top</option>
-      <option value="center">paste center</option>
-      <option value="fill">paste fill</option>
-      <option value="flipH">flip horizontal</option>
-      <option value="flipV">flip vertical</option>
-    </select>
+    <button id="btnHelpCutCopy" onclick="showHelp(this);">?</button>
+    <div id="divHelpCutCopy" class="help" style="display: none;">
+      <button id="btxHelpCutCopy" style="float: right;" onclick="showHelp(this);">X</button>
+      When a cut/copy option is selected from the dropdown <br />
+      the currently selected cells are saved to the clipboard.<br />
+      If cut is selected, the currently selected cells are reset to colorA.<br />
+    </div>
+    <br />
+    <div id="divPaste" style="display: none;">
+      <select id="selPaste" onchange="selectPaste(this);">
+        <option value="">-- paste --</option>
+        <option value="leftTop">paste left top</option>
+        <option value="center">paste center</option>
+        <option value="fill">paste fill</option>
+        <option value="flipH">flip horizontal</option>
+        <option value="flipV">flip vertical</option>
+      </select>
+      <button id="btnHelpPaste" onclick="showHelp(this);">?</button>
+      <div id="divHelpPaste" class="help" style="display: none;">
+        <button id="btxHelpPaste" style="float: right;" onclick="showHelp(this);">X</button>
+        When a paste option is selected from the dropdown<br />
+        the cells saved in the clipboard are pasted into the currently selected cells <br />
+        based on the paste option selected:<br />
+        paste left top - the left/top of the pasted cells match the left/top of the currently selected cells<br />
+        paste center - the center of the pasted cells match the center of the currently selected cells<br />
+        paste fill - the left/top of the pasted cells match the left/top of the currently selected cells
+        and the pasted cells repeat horizontally and vertically to fill the currently selected cells<br />
+        flip horizontal - the left/top of the pasted cells match the left/top of the currently selected cells
+        and the pasted cells are flipped horizontally<br />
+        flip vertical - the left/top of the pasted cells match the left/top of the currently selected cells
+        and the pasted cells are flipped vertically<br />
+      </div>
+    </div>
   </div>
 
   <div id="divScroll">
@@ -139,15 +231,35 @@
         <option value="S">square</option>
         <option value="H">hexagon</option>
       </select>
+      <button id="btnHelpPreviewShape" onclick="showHelp(this);">?</button>
+      <div id="divHelpPreviewShape" class="help" style="display: none;">
+        <button id="btxHelpPreviewShape" style="float: right;" onclick="showHelp(this);">X</button>
+        Determines the shape of the preview that appears below.<br />
+        as charted - the shape of the preview matches the shape in the chart.<br />
+        square - in the preview, the shape in the chart is repeated/rotated 4 times to form a square.<br />
+        hexagon - in the preview, the shape in the chart is repeated/rotated 6 times to form a hexagon.
+      </div>
       <input id="chkReversePreview" type="checkbox" onchange="changeReversePreview();" /> reverse colors
+      <button id="btnHelpReversePreview" onclick="showHelp(this);">?</button>
+      <div id="divHelpReversePreview" class="help" style="display: none;">
+        <button id="btxHelpReversePreview" style="float: right;" onclick="showHelp(this);">X</button>
+        When this checkbox is checked, the colors in the preview are reversed.<br />
+        colorA is shown as the dark color and colorB is shown as the light color.
+      </div>
       <input id="chkTile" type="checkbox" onchange="changeTile();" /> tile
+      <button id="btnHelpTile" onclick="showHelp(this);">?</button>
+      <div id="divHelpTile" class="help" style="display: none;">
+        <button id="btxHelpTile" style="float: right;" onclick="showHelp(this);">X</button>
+        When this checkbox is checked, the preview shape is shown tiled<br />
+        repeated 3 times vertically and 3 times horizontally.
+      </div>
     </div>
   </div>
   <div style="clear: left;">
     <canvas id="cnvPlain" width="31" height="31"></canvas>
     <canvas id="cnvRepeat" width="31" height="31" style="display: none;"></canvas>
   </div>
-  
+
   <div id="divInstructions" class="section">
     <div id="divInstructionsTitle" class="sectionTitle">
       instructions
@@ -159,13 +271,22 @@
         <option value="C">import to clipboard</option>
       </select>
     </div>
+    <button id="btnHelpImportInstructions" onclick="showHelp(this);">?</button>
+    <div id="divHelpImportInstructions" class="help" style="display: none;">
+      <button id="btxHelpImportInstructions" style="float: right;" onclick="showHelp(this);">X</button>
+      Click [import] to import the instructions. The instructions will overwrite the existing chart, by default.<br />
+      Select "import to clipboard" to leave the existing chart in place and import the instructions to the clipboard.<br />
+      Once the "imported" message appears, select an area on the chart and choose a paste option to place the imported instructions
+      onto the existing chart.<br />
+    </div>
   </div>
 
   <div style="clear: left;">
     <textarea id="txtInstructions" cols="80" rows="30"></textarea>
   </div>
-  
+
   <img id="imgImport" style="display: none;" />
   <script src="script.js"></script>
 </body>
+
 </html>
