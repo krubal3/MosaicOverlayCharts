@@ -34,6 +34,17 @@ var decrease = "-";
 
 // -- global functions 
 
+function showHelp(btn) {
+  let idDiv = "div" + btn.id.substring(3);
+  let divHelp = document.getElementById(idDiv);
+  if (divHelp.style.display == "none") {
+    divHelp.style.display = "";
+  }
+  else {
+    divHelp.style.display = "none";
+  }
+}
+
 // gets the row and column
 // from the id of the td in the table
 // returns:
@@ -273,7 +284,7 @@ function importImage() {
       arrCells.sort((a,b) => b.row - a.row);
 
       selection.cells = arrCells;
-      alert("Imported to clipboard.");
+      alert("Imported to clipboard.  Select an area in the chart and choose a paste option.");
     }
   }
 }
@@ -1442,7 +1453,6 @@ function importInstructions() {
       loadChart();
       refreshPreview();
       writeInstructions();
-      alert("Imported");
     }
     else {
       resetEdgeColumnsInArray(arrGrid, importGridRows, importGridColumns);
@@ -1450,7 +1460,7 @@ function importInstructions() {
       arrGrid.sort((a,b) => b.column - a.column);
       arrGrid.sort((a,b) => b.row - a.row);
       selection.cells = arrGrid;
-      alert("Imported to clipboard.");
+      alert("Imported to clipboard.  Select an area in the chart and choose a paste option.");
     }
   }
 }

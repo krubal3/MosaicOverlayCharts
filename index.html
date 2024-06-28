@@ -18,11 +18,32 @@
         <option value="CR">crochet (RS only)</option>
         <option value="C">crochet (back and forth)</option>
       </select>
+      <button id="btnHelpChartType" onclick="showHelp(this);">?</button>
+      <div id="divHelpChartType" class="help" style="display: none;">
+        Select the type of chart to display:<br />
+        garter - knit in garter stitch (back and forth or in the round)<br />
+        stockinette - knit in stockinette stitch (back and forth or in the round)<br />
+        crochet (RS only) - crocheted working on the right side of the work only (no turning)<br />
+        crochet (back and forth) - crocheted working back and forth, turning the work every two rows<br />
+      </div>
       |
       grid columns: 
       <input id="txtGridColumns" type="number" value="31" min="1" max="999" size="3" onchange="changeGridColumns(this.value);" />
+      <button id="btnHelpGridColumns" onclick="showHelp(this);">?</button>
+      <div id="divHelpGridColumns" class="help" style="display: none;">
+        Enter the number of columns to include in the grid for the chart and click [ok].  Each column represents a stitch.
+      </div>
       grid rows: 
       <input id="txtGridRows" type="number" value="31" min="1" max="999" size="3" onchange="changeGridRows(this.value);" />
+      <button id="btnHelpGridRows" onclick="showHelp(this);">?</button>
+      <div id="divHelpGridRows" class="help" style="display: none;">
+        Enter the number of rows to include in the grid for the chart and click [ok].  
+        Each row represents a row of knitting or crochet.<br />
+        For garter and stockinette, only the odd rows are shown in the grid.<br />
+        For garter, if working back and forth, all even rows are knit across on the wrong side.  If working in the round, all even rows are purled across on the right side.<br />
+        For stockinette, if working back and forth, all even rows are purled across on the wrong side.   If working in the round, all even rows are knit across on the right side.<br />
+        For crochet, all rows are shown in the chart.  Right side rows are numbered on the right and wrong side rows are numbered on the left.
+      </div>
       <button>ok</button>
     </div>
   </div>
@@ -38,8 +59,16 @@
         <option value="C">columns</option>
         <option value="R">rows</option>
       </select>
+      <button id="btnHelpFitType" onclick="showHelp(this);">?</button>
+      <div id="divHelpFitType" class="help" style="display: none;">
+        Enter the number of rows or columns to fit the image inside of and select whether the number is the number of rows or columns.
+      </div>
       |
       <input id="fleImage" type="file" />
+      <button id="btnHelpImage" onclick="showHelp(this);">?</button>
+      <div id="divHelpImage" class="help" style="display: none;">
+        Select the file that contains the image to import.  Select a simple, high contrast image in jpg, png, or gif format.
+      </div>
       <button id="btnImportImage" onclick="importImage();">import</button>
       <select id="selImportImageTo">
         <option value="">overwrite existing chart</option>

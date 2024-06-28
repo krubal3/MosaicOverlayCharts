@@ -51,6 +51,12 @@ td {
     padding: 3px;
 }
 
+.help {
+    border: 1px solid black;
+    background-color: white;
+    position: absolute;
+}
+
   
   
 
