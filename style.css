@@ -17,6 +17,7 @@ table {
 #tblChart {
     border-collapse: collapse;
     table-layout: fixed;  
+    width: 100%;
 }
 
 td {

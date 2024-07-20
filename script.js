@@ -6,7 +6,8 @@ var pattern = {
   gridColumns: 31,
   gridRows: 31,
   cellsColorB: [],
-  cellsNoStitch: []
+  cellsNoStitch: [],
+  font: []
 };
 
 // colors
@@ -847,6 +848,61 @@ function selectCutCopy(selCutCopy) {
   savePattern();
 }
 
+function selectFont() {
+  let idRange = getIdRange(selection.fromId, selection.toId);
+  let fontLetter = prompt("font letter:");
+  if (fontLetter != null) {
+    let fontEntry = pattern.font.find((fe) => fe.letter.charCodeAt(0) == fontLetter.charCodeAt(0));
+    if (fontEntry == undefined) {
+      fontEntry = {
+        letter: fontLetter,
+        instructions: ""
+      }
+      pattern.font.push(fontEntry);
+    }
+    let fontInstruct = idRange.maxC - idRange.minC + 1;
+    for (r = idRange.minR; r <= idRange.maxR + 1; r++) {
+      let arrSts = new Array();
+      for (c = idRange.minC; c <= idRange.maxC; c++) {
+        let gridTd = getCell(r, c);
+        gridTd.style.borderColor = "";
+        let txt = plain;
+        if (gridTd.innerHTML == overlay) {
+          txt = overlay;
+        }
+        let st = {
+          "num": 1,
+          "txt": txt
+        };
+        arrSts.push(st);
+      }
+      if (arrSts.length > 0) {
+        fontInstruct = fontInstruct + "; " + convertRow(arrSts);      
+      }
+    }
+    fontEntry.instructions = fontInstruct;
+    writeFontInstructions();
+    selection.cells = [];
+    selection.fromId = "";
+    selection.toId = "";  
+    let divSelectionMenu = document.getElementById("divSelectionMenu");
+    divSelectionMenu.style.display = "none";
+    addXs();
+    refreshPreview();
+    writeInstructions();
+    savePattern();  
+  }
+}
+
+function writeFontInstructions() {
+  let fontInstruct = "";
+  for (f = 0; f < pattern.font.length; f++) {
+    fontInstruct = fontInstruct + pattern.font[f].letter + ": " + pattern.font[f].instructions + "\n";
+  }
+  let txtFont = document.getElementById("txtFont");
+  txtFont.value = fontInstruct;
+}
+
 // when the cancel button is clicked in the selection menu
 // the current selection is cancelled.
 function cancelSelection() {
@@ -1674,6 +1730,143 @@ function restorePattern() {
   document.getElementById("selChartType").value = pattern.chartType;
   document.getElementById("txtGridColumns").value = pattern.gridColumns;
   document.getElementById("txtGridRows").value = pattern.gridRows;
+  if (pattern.font == undefined) {
+    resetFont();
+  }
+  writeFontInstructions();
+}
+
+function readFont(fontInstruct) {
+  let arrFontInstruct = fontInstruct.split("\n");
+  let arrFont = new Array();
+  let maxFontRows = 0;
+  for (f = 0; f < arrFontInstruct.length; f++) {
+    let fontInstruct = arrFontInstruct[f].trim();
+    if (fontInstruct.indexOf(":") > -1) {
+
+      let fontEntry = {
+        letter: fontInstruct.split(":")[0],
+        instructions: fontInstruct.split(":")[1].trim()
+      }
+      if (fontInstruct.substring(0,2) == "::") {
+        fontEntry.letter = ":";
+        fontEntry.instructions = arrFontInstruct[f].split(":")[2].trim();
+      }
+      else {
+        if (fontInstruct.substring(0,1) == ":") {
+          fontEntry.letter = " ";
+        }
+      }
+      if (fontEntry.instructions.split(";").length > maxFontRows) {
+        maxFontRows = fontEntry.instructions.split(";").length;
+      }
+      arrFont.push(fontEntry);
+    }
+  }
+  // must end on odd row
+  if (maxFontRows % 2 == 0) { 
+    maxFontRows = maxFontRows + 1;
+  }
+  // make sure all font entries have the same number of rows
+  for (f = 0; f < arrFont.length; f++) {
+    let fontEntry = arrFont[f];
+    let startRow = fontEntry.instructions.split(";").length + 1;
+    let addCols = fontEntry.instructions.split(";")[0];
+    for (ar = startRow; ar <= maxFontRows; ar++) {
+      if (ar % 2 == 0) {
+        fontEntry.instructions = fontEntry.instructions + "; " + addCols;
+      }
+      else {
+        fontEntry.instructions = fontEntry.instructions + "; " + addCols + overlay;
+      }
+    }
+  }
+  pattern.font = arrFont;
+  savePattern();
+}
+
+function resetFont() {
+  if (confirm("okay to overwrite current font with the built-in default font?")) {
+    let hidFont = document.getElementById("hidFont");
+    readFont(hidFont.value);
+  }
+  writeFontInstructions();
+}
+
+function importFont() {
+  if (confirm("okay to overwrite current font with the imported font?")) {
+    let txtFont = document.getElementById("txtFont");
+    readFont(txtFont.value);
+  }
+  writeFontInstructions();
+}
+
+function importText() {
+  let kern = document.getElementById("txtKern").value;
+  if (parseInt(kern, 10) < 1) {
+    kern = 1;
+  }
+  if (pattern.font.length == 0) {
+    resetFont();
+  }
+  let fontEntry = pattern.font.find((fe) => fe.letter == " ");
+  if (fontEntry == undefined) {
+    fontEntry = {
+      letter: " ",
+      instructions: "3"
+    }
+    pattern.font.push(fontEntry);
+  }
+  writeFontInstructions();
+  let txtFont = document.getElementById("txtFont");
+  readFont(txtFont.value);
+  let textInstruct = "";
+  let fontHeight = pattern.font[0].instructions.split(";").length;
+  let txtText = document.getElementById("txtText");
+  let arrText = txtText.value.split("\n");
+  let row = 1;
+  for (t = arrText.length - 1; t >= 0; t--) {
+    for (r = 0; r < fontHeight; r++) {
+      textInstruct = textInstruct + "row " + row + ": ";
+      for (s = arrText[t].length - 1; s >= 0; s --) {
+        let letter = arrText[t].substring(s, s+1);
+        fontEntry = pattern.font.find((fe) => fe.letter.charCodeAt(0) == letter.charCodeAt(0));
+        if (fontEntry == undefined) {
+          fontEntry = pattern.font.find((fe) => fe.letter == " ");
+        }
+        if (s == arrText[t].length - 1) {
+          if (row != 1 && row % 2 != 0) {
+            textInstruct = textInstruct + kern + overlay;
+          }
+          else {
+            textInstruct = textInstruct + kern;
+          }
+        }
+        textInstruct = textInstruct + ", " + fontEntry.instructions.split(";")[r];
+        if (row != 1 && row % 2 != 0) {
+          textInstruct = textInstruct + ", " + kern + overlay;
+        }
+        else {
+          textInstruct = textInstruct + ", " + kern;
+        }
+      }
+      textInstruct = textInstruct + "\n";
+      row = row + 1;
+    }
+    if (t != 0) {
+      textInstruct = textInstruct + "row " + row + ": 1" + "\n";
+      row = row + 1;
+    }
+  }
+  if (row % 2 != 0) {
+    textInstruct = textInstruct + "row " + row + ": 1" + "\n";
+  }
+  let txtInstructions = document.getElementById("txtInstructions");
+  txtInstructions.value = textInstruct;
+  let selImportInstructionsTo = document.getElementById("selImportInstructionsTo");
+  let selImportTextTo = document.getElementById("selImportTextTo");
+  selImportInstructionsTo.value = selImportTextTo.value;
+  importInstructions();
 }
 
 // loads the chart based on the pattern global variable
