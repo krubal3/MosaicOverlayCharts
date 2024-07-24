@@ -9,11 +9,15 @@
 </head>
 
 <body>
-  <div id="divSetupChart" class="section">
-    <div id="divSetupChartTitle" class="sectionTitle">
-      setup chart
-    </div>
-    <div id="divSetupChartBody" class="sectionBody">
+  <div id="divTabs" class="tabSection">
+    <a id="tabSetupChart" class="tabTitle tabSelected" onclick="switchTab('SetupChart');">setup chart</a>
+    <a id="tabEditChart" class="tabTitle" onclick="switchTab('EditChart');">edit chart</a>
+    <a id="tabImportImage" class="tabTitle" onclick="switchTab('ImportImage');">import image</a>
+    <a id="tabImportText" class="tabTitle" onclick="switchTab('ImportText');">import text</a>
+    <a id="tabImportFont" class="tabTitle" onclick="switchTab('ImportFont');">import font</a>
+  
+  
+    <div id="divSetupChart" class="tabBody">
       <select id="selChartType" onchange="changeChartType(this.value);">
         <option value="G">garter</option>
         <option value="S">stockinette</option>
@@ -56,13 +60,8 @@
       </div>
       <button>ok</button>
     </div>
-  </div>
 
-  <div id="divImportImage" class="section">
-    <div id="divImportImageTitle" class="sectionTitle">
-      import image
-    </div>
-    <div id="divImportImageBody" class="sectionBody">
+    <div id="divImportImage" style="display: none;" class="tabBody">
       fit to:
       <input id="txtFitNumber" type="number" value="31" min="1" max="999" size="3" />
       <select id="selFitType">
@@ -96,13 +95,8 @@
         onto the existing chart.<br />
       </div>
     </div>
-  </div>
-
-  <div id="divEditChart" class="section">
-    <div id="divEditChartTitle" class="sectionTitle">
-      edit chart
-    </div>
-    <div id="divEditChartBody" class="sectionBody">
+      
+    <div id="divEditChart" style="display: none;" class="tabBody">
       mode:
       <select id="selMode" onchange="changeMode(this.value);">
         <option value="T">toggle</option>
@@ -141,6 +135,45 @@
         Clears the chart, resetting the color of all the stitches to colorA where possible. <br />
         The edge stitches on even rows must be colorB. <br />
         If the chart contains an even number of rows, the final row must be colorB.
+      </div>
+    </div>
+
+    <div id="divImportText" style="display: none;" class="tabBody">
+      text:
+      <textarea id="txtText" cols="80" rows="2"></textarea>
+      kern:
+      <input id="txtKern" type="number" value="1" min="1" max="99" size="2" />
+      <button id="btnHelpKern" onclick="showHelp(this);">?</button>
+      <div id="divHelpKern" class="help" style="display: none;">
+        <button id="btxHelpKern" style="float: right;" onclick="showHelp(this);">X</button>
+        How many stitches to leave between letters in a word.  Defaults to 1.
+      </div>
+      <button id="btnImportText" onclick="importText();">import</button>
+      <select id="selImportTextTo">
+        <option value="">overwrite existing chart</option>
+        <option value="C">import to clipboard</option>
+      </select>
+      <button id="btnHelpImportText" onclick="showHelp(this);">?</button>
+      <div id="divHelpImportText" class="help" style="display: none;">
+        <button id="btxHelpImportText" style="float: right;" onclick="showHelp(this);">X</button>
+        Click [import] to import the text. The text will overwrite the existing chart, by default.<br />
+        Select "import to clipboard" to leave the existing chart in place and import the text to the clipboard.<br />
+        Once the "imported" message appears, select an area on the chart and choose a paste option to place the imported text
+        onto the existing chart.<br />
+      </div>
+    </div>
+    
+    <div id="divImportFont" style="display: none;" class="tabBody">
+      font instructions:
+      <textarea id="txtFont" cols="80" rows="3"></textarea>
+      <button id="btnImportFont" onclick="importFont();">import</button>
+      <button id="btnImportFont" onclick="resetFont();">reset</button>
+      <button id="btnHelpImportFont" onclick="showHelp(this);">?</button>
+      <div id="divHelpImportFont" class="help" style="display: none;">
+        <button id="btxHelpImportFont" style="float: right;" onclick="showHelp(this);">X</button>
+        Click [import] to import your own font. The imported font will overwrite the existing font.<br />
+        Click [reset] to reset the font to the built-in font.
+        <br />
       </div>
     </div>
   </div>
@@ -225,6 +258,8 @@
     </div>
   </div>
 
+  <div id="divSpacer" style="height: 90px;">
+  </div>
   <div id="divScroll">
     <table id="tblChart"></table>
   </div>
@@ -293,60 +328,7 @@
   <div style="clear: left;">
     <textarea id="txtInstructions" cols="80" rows="10"></textarea>
   </div>
-
-  <div id="divText" class="section">
-    <div id="divTextTitle" class="sectionTitle">
-      text
-    </div>
-    <div id="divTextBody" class="sectionBody">
-      kern:
-      <input id="txtKern" type="number" value="1" min="1" max="99" size="2" />
-      <button id="btnHelpKern" onclick="showHelp(this);">?</button>
-      <div id="divHelpKern" class="help" style="display: none;">
-        <button id="btxHelpKern" style="float: right;" onclick="showHelp(this);">X</button>
-        How many stitches to leave between letters in a word.  Defaults to 1.
-      </div>
-      <button id="btnImportText" onclick="importText();">import</button>
-      <select id="selImportTextTo">
-        <option value="">overwrite existing chart</option>
-        <option value="C">import to clipboard</option>
-      </select>
-    </div>
-    <button id="btnHelpImportText" onclick="showHelp(this);">?</button>
-    <div id="divHelpImportText" class="help" style="display: none;">
-      <button id="btxHelpImportText" style="float: right;" onclick="showHelp(this);">X</button>
-      Click [import] to import the text. The text will overwrite the existing chart, by default.<br />
-      Select "import to clipboard" to leave the existing chart in place and import the text to the clipboard.<br />
-      Once the "imported" message appears, select an area on the chart and choose a paste option to place the imported text
-      onto the existing chart.<br />
-    </div>
-  </div>
-
-  <div style="clear: left;">
-    <textarea id="txtText" cols="80" rows="3"></textarea>
-  </div>
-
-  <div id="divFont" class="section">
-    <div id="divFontTitle" class="sectionTitle">
-      font
-    </div>
-    <div id="divFontBody" class="sectionBody">
-      <button id="btnImportFont" onclick="importFont();">import</button>
-      <button id="btnImportFont" onclick="resetFont();">reset</button>
-    </div>
-    <button id="btnHelpImportFont" onclick="showHelp(this);">?</button>
-    <div id="divHelpImportFont" class="help" style="display: none;">
-      <button id="btxHelpImportFont" style="float: right;" onclick="showHelp(this);">X</button>
-      Click [import] to import your own font. The imported font will overwrite the existing font.<br />
-      Click [reset] to reset the font to the built-in font.
-      <br />
-    </div>
-  </div>
-
-  <div style="clear: left;">
-    <textarea id="txtFont" cols="80" rows="3"></textarea>
-  </div>
-
+  
   <input id="hidFont" type="hidden" value="A: 5; 5; 5X; 5; 1, 3X, 1; 1X, 3, 1X; 5; (1, 1X) 2 times, 1; 1X, 3, 1X; 2, 1X, 2; 2X, 1, 2X
   B: 4; 4; 4X; 4; 4; 1X, 2, 1X; 1, 2X, 1; 1X, 2, 1X; 4; (1, 1X) 2 times; 1X, 3
   C: 4; 4; 4X; 4; 4; 3, 1X; 3X, 1; 3, 1X; 1, 2X, 1; 1X, 2, 1X; 4

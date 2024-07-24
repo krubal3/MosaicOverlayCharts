@@ -33,6 +33,8 @@ var overlay = "X";
 var increase = "+";
 var decrease = "-";
 
+var tabs = ["SetupChart", "EditChart", "ImportImage", "ImportText", "ImportFont"]
+
 // -- global functions 
 
 function showHelp(btn) {
@@ -115,6 +117,22 @@ function getIdRange(fromId, toId) {
     minC: minC,
     maxC: maxC
   }
+}
+
+function switchTab(id){
+  for (t = 0; t < tabs.length; t++) {
+    let div = document.getElementById("div" + tabs[t]);
+    div.style.display = "none";
+    if (tabs[t] == id) {
+      div.style.display = "";
+    }
+    let anchor = document.getElementById("tab" + tabs[t]);
+    anchor.className = "tabTitle";
+    if (tabs[t]== id) {
+      anchor.classList.add("tabSelected");
+    }
+  }
+
 }
 
 // -- setup chart --
@@ -1828,6 +1846,7 @@ function importText() {
   for (t = arrText.length - 1; t >= 0; t--) {
     for (r = 0; r < fontHeight; r++) {
       textInstruct = textInstruct + "row " + row + ": ";
+      
       for (s = arrText[t].length - 1; s >= 0; s --) {
         let letter = arrText[t].substring(s, s+1);
         fontEntry = pattern.font.find((fe) => fe.letter.charCodeAt(0) == letter.charCodeAt(0));
