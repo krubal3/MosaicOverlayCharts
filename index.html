@@ -74,6 +74,12 @@
         numbered on the left.
       </div>
       <button>ok</button>
+      <input id="chkEdgeStitches" type="checkbox" checked="true" onchange="changeEdgeStitches(this.checked);" />edge stitches
+      <button id="btnHelpEdgeStitches" onclick="showHelp(this);">?</button>
+      <div id="divHelpEdgeStitches" class="help" style="display: none;">
+        <button id="btxEdgeStitches" style="float: right;" onclick="showHelp(this);">X</button>
+        When checked the first and last stitches of each row are worked as plain stitches in the color of the row.
+      </div>
     </div>
 
     <div id="divImportImage" style="display: none;" class="tabBody">

@@ -7,7 +7,8 @@ var pattern = {
   gridRows: 31,
   cellsColorB: [],
   cellsNoStitch: [],
-  font: []
+  font: [],
+  edgeStitches: true
 };
 
 // colors
@@ -136,6 +137,13 @@ function switchTab(id){
 }
 
 // -- setup chart --
+
+function changeEdgeStitches(checked) {
+  pattern.edgeStitches = checked;
+  addXs();
+  savePattern();
+}
+
 
 // changes the type of chart displayed
 // chartType - the type of chart to display
@@ -575,19 +583,21 @@ function addXs() {
     for (c = pattern.gridColumns; c >= 1; c--) {
       let td = getCell(r, c);
       td.innerHTML = plain;
-      if (c == edgeColumns.first || c == edgeColumns.last || r == 1 || r == pattern.gridRows) {
-        if (r % 2 == 0) {
-          td.style.backgroundColor = colorB;
-        }
-        else {
-          td.style.backgroundColor = colorA;
+      if (pattern.edgeStitches) {
+        if (c == edgeColumns.first || c == edgeColumns.last || r == 1 || r == pattern.gridRows) {
+          if (r % 2 == 0) {
+            td.style.backgroundColor = colorB;
+          }
+          else {
+            td.style.backgroundColor = colorA;
+          }
         }
       }
       let rBelow = parseInt(r, 10) - 1;
       let tdBelow = getCell(rBelow, c);
       let color = td.style.backgroundColor;
       let colorBelow = tdBelow.style.backgroundColor;
-      if (c > edgeColumns.first && c < edgeColumns.last) {
+      if (!pattern.edgeStitches || (c > edgeColumns.first && c < edgeColumns.last)) {
         if (r % 2 == 0) {
           if (color == colorB && colorBelow == colorB) {
             td.innerHTML = overlay;
@@ -838,18 +848,20 @@ function selectCutCopy(selCutCopy) {
 
   let arrCells = new Array();
   for (r = pattern.gridRows; r > 1; r--) {
-    for (c = pattern.gridColumns - 1; c > 1; c--) {
-      let gridTd = getCell(r, c);
-      gridTd.style.borderColor = "";
-      if (r >= idRange.minR && r <= idRange.maxR && c >= idRange.minC && c <= idRange.maxC) {
-        let cell = {
-          row: r,
-          column: c,
-          color: gridTd.style.backgroundColor
-        }
-        arrCells.push(cell);
-        if (selCutCopy.value == "cut") {
-          gridTd.style.backgroundColor = colorA;
+    for (c = pattern.gridColumns; c >= 1; c--) {
+      if ((c > 1 && c < pattern.gridColumns) || !pattern.edgeStitches) {
+        let gridTd = getCell(r, c);
+        gridTd.style.borderColor = "";
+        if (r >= idRange.minR && r <= idRange.maxR && c >= idRange.minC && c <= idRange.maxC) {
+          let cell = {
+            row: r,
+            column: c,
+            color: gridTd.style.backgroundColor
+          }
+          arrCells.push(cell);
+          if (selCutCopy.value == "cut") {
+            gridTd.style.backgroundColor = colorA;
+          }
         }
       }
     }
@@ -1748,6 +1760,7 @@ function restorePattern() {
   document.getElementById("selChartType").value = pattern.chartType;
   document.getElementById("txtGridColumns").value = pattern.gridColumns;
   document.getElementById("txtGridRows").value = pattern.gridRows;
+  document.getElementById("chkEdgeStitches").checked = pattern.edgeStitches;
   if (pattern.font == undefined) {
     resetFont();
   }
