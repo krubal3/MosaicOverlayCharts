@@ -25,14 +25,12 @@
       If the chart contains an even number of rows, the final row must be colorB.
     </div>
     <br />
-    <a id="tabSetupChart" class="tabTitle tabSelected" onclick="switchTab('SetupChart');">setup chart</a>
-    <a id="tabEditChart" class="tabTitle" onclick="switchTab('EditChart');">edit chart</a>
+    <a id="tabChartSettings" class="tabTitle tabSelected" onclick="switchTab('ChartSettings');">chart settings</a>
     <a id="tabImportImage" class="tabTitle" onclick="switchTab('ImportImage');">import image</a>
     <a id="tabImportText" class="tabTitle" onclick="switchTab('ImportText');">import text</a>
     <a id="tabImportFont" class="tabTitle" onclick="switchTab('ImportFont');">import font</a>
 
-
-    <div id="divSetupChart" class="tabBody">
+    <div id="divChartSettings" class="tabBody">
       <select id="selChartType" onchange="changeChartType(this.value);">
         <option value="G">garter</option>
         <option value="S">stockinette</option>
@@ -48,16 +46,15 @@
         crochet (RS only) - crocheted working on the right side of the work only (no turning)<br />
         crochet (back and forth) - crocheted working back and forth, turning the work every two rows<br />
       </div>
-      grid columns:
-      <input id="txtGridColumns" type="number" value="31" min="1" max="999" size="3"
-        onchange="changeGridColumns(this.value);" />
+      columns:
+      <input id="txtGridColumns" type="number" value="31" min="1" max="999" size="3" changeGridColumns(this.value);" />
       <button id="btnHelpGridColumns" onclick="showHelp(this);">?</button>
       <div id="divHelpGridColumns" class="help" style="display: none;">
         <button id="btxHelpGridColumns" style="float: right;" onclick="showHelp(this);">X</button>
         Enter the number of columns to include in the grid for the chart and click [ok]. Each column represents a
         stitch.
       </div>
-      grid rows:
+      rows:
       <input id="txtGridRows" type="number" value="31" min="1" max="999" size="3"
         onchange="changeGridRows(this.value);" />
       <button id="btnHelpGridRows" onclick="showHelp(this);">?</button>
@@ -79,6 +76,31 @@
       <div id="divHelpEdgeStitches" class="help" style="display: none;">
         <button id="btxEdgeStitches" style="float: right;" onclick="showHelp(this);">X</button>
         When checked the first and last stitches of each row are worked as plain stitches in the color of the row.
+      </div>
+      mode:
+      <select id="selMode" onchange="changeMode(this.value);">
+        <option value="T">toggle</option>
+        <option value="S">select</option>
+        <option value="F">fill</option>
+      </select>
+      <button id="btnHelpMode" onclick="showHelp(this);">?</button>
+      <div id="divHelpMode" class="help" style="display: none;">
+        <button id="btxHelpMode" style="float: right;" onclick="showHelp(this);">X</button>
+        Select the editing mode.<br />
+        toggle - clicking on a stitch in the chart, toggles the stitch between colorA and colorB. If "shaping" is
+        checked, the stitch toggles between colorA and "no stitch".<br />
+        select - if there is no current selection, clicking on a stitch begins a selection, otherwise, clicking on a
+        stitch changes the end of the range of selected stitches and displays the selection menu.<br />
+        fill - clicking on a stitch fills the area that includes the stitch with the opposite color. When filling colorB
+        with colorA, the edges of the area are left in colorB.
+      </div>
+      <input id="chkShaping" type="checkbox" />shaping
+      <button id="btnHelpShaping" onclick="showHelp(this);">?</button>
+      <div id="divHelpShaping" class="help" style="display: none;">
+        <button id="btxHelpShaping" style="float: right;" onclick="showHelp(this);">X</button>
+        Checking this checkbox allows shaping to be defined in the chart by setting a stitch to "no stitch" to designate
+        an increase or decrease.<br />
+        An increase will have a "no stitch" below it and a decrease will have a "no stitch" above it.
       </div>
     </div>
 
@@ -116,35 +138,6 @@
         image
         onto the existing chart.<br />
       </div>
-    </div>
-
-    <div id="divEditChart" style="display: none;" class="tabBody">
-      mode:
-      <select id="selMode" onchange="changeMode(this.value);">
-        <option value="T">toggle</option>
-        <option value="S">select</option>
-        <option value="F">fill</option>
-      </select>
-      <button id="btnHelpMode" onclick="showHelp(this);">?</button>
-      <div id="divHelpMode" class="help" style="display: none;">
-        <button id="btxHelpMode" style="float: right;" onclick="showHelp(this);">X</button>
-        Select the editing mode.<br />
-        toggle - clicking on a stitch in the chart, toggles the stitch between colorA and colorB. If "shaping" is
-        checked, the stitch toggles between colorA and "no stitch".<br />
-        select - if there is no current selection, clicking on a stitch begins a selection, otherwise, clicking on a
-        stitch changes the end of the range of selected stitches and displays the selection menu.<br />
-        fill - clicking on a stitch fills the area that includes the stitch with the opposite color. When filling colorB
-        with colorA, the edges of the area are left in colorB.
-      </div>
-      <input id="chkShaping" type="checkbox" />shaping
-      <button id="btnHelpShaping" onclick="showHelp(this);">?</button>
-      <div id="divHelpShaping" class="help" style="display: none;">
-        <button id="btxHelpShaping" style="float: right;" onclick="showHelp(this);">X</button>
-        Checking this checkbox allows shaping to be defined in the chart by setting a stitch to "no stitch" to designate
-        an increase or decrease.<br />
-        An increase will have a "no stitch" below it and a decrease will have a "no stitch" above it.
-      </div>
-
     </div>
 
     <div id="divImportText" style="display: none;" class="tabBody">

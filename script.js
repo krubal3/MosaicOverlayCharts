@@ -34,7 +34,7 @@ var overlay = "X";
 var increase = "+";
 var decrease = "-";
 
-var tabs = ["SetupChart", "EditChart", "ImportImage", "ImportText", "ImportFont"]
+var tabs = ["ChartSettings", "ImportImage", "ImportText", "ImportFont"]
 
 // -- global functions 
 
