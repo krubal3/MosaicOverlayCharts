@@ -8,7 +8,8 @@ var pattern = {
   cellsColorB: [],
   cellsNoStitch: [],
   font: [],
-  edgeStitches: true
+  edgeStitches: true,
+  highlight: 0
 };
 
 // colors
@@ -137,6 +138,63 @@ function switchTab(id){
 }
 
 // -- setup chart --
+
+// populates the highlight dropdown and 
+// if the pattern has been saved with a row selected
+// highlights that row.
+function populateHighlight(){
+  let selHighlight = document.getElementById("selHighlight");
+  while (selHighlight.length > 1) {
+    selHighlight.remove(selHighlight.length - 1);
+  }
+  for (r = 1; r <= pattern.gridRows; r++) {
+    let rowLabel = r;
+    if (pattern.chartType == "G" || pattern.chartType == "S") {
+      rowLabel = (r * 2) - 1;
+    }
+    let option = document.createElement("option");
+    option.value = r;
+    option.text = rowLabel;
+    selHighlight.add(option);
+  }
+  selHighlight.selectedIndex = pattern.highlight;
+  if (pattern.highlight > 0) {
+    displayHighlight(pattern.highlight);
+  }
+}
+
+// removes the highlight from any previously highlighted row and
+// adds the highlight to the specified row.
+// row - number of the grid row to highlight.
+function displayHighlight(row) {
+  let spanHighlight = document.getElementById("spanHighlight");
+    if (spanHighlight != null) {
+      spanHighlight.remove();
+    }
+  if (row > 0) {
+    let td = document.getElementById("_" + row + "_left");
+    spanHighlight = document.createElement("span");
+    spanHighlight.id = "spanHighlight";
+    spanHighlight.innerHTML = "&nbsp;";
+    spanHighlight.onclick = "return false;";
+    let tblChart = document.getElementById("tblChart");
+    let w = tblChart.getBoundingClientRect().width;
+    spanHighlight.style.width = w + "px";
+    td.appendChild(spanHighlight);
+  }
+}
+
+// when the highlight dropdown is changed,
+// updates the pattern with the selected row
+// removes the highlight from any previously highlighted row and
+// adds the highlight to the newly selected row and
+// saves the updated pattern.
+// row - newly selected row.
+function changeHighlight(row) {
+  pattern.highlight = row;
+  displayHighlight(row);
+  savePattern();
+}
 
 function changeEdgeStitches(checked) {
   pattern.edgeStitches = checked;
@@ -1931,6 +1989,7 @@ function loadChart() {
   for (r = pattern.gridRows; r > 0; r--) {
     row = thead.insertRow();
     td = document.createElement("td");
+    td.id = "_" + r + "_left";
     let rowColor = "A";
     if (r % 2 == 0) {
       rowColor = "B";
@@ -2007,6 +2066,7 @@ function loadChart() {
     }
   }
   addXs();
+  populateHighlight();
 }
 
 addEventListener('load', restorePattern());

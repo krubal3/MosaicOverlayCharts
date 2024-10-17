@@ -10,6 +10,14 @@ body {
     width:100%;
 }
 
+#spanHighlight {
+    pointer-events: none;
+    position: absolute;
+    background: rgba(255, 255, 0, 0.5);
+    z-index: 99;
+    height: 10px;
+}
+
 table {
     table-layout: fixed;
 }

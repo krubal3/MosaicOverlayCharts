@@ -24,6 +24,14 @@
       The edge stitches on even rows must be colorB. <br />
       If the chart contains an even number of rows, the final row must be colorB.
     </div>
+    highlight: <select id="selHighlight" onchange="changeHighlight(this.value);">
+      <option value="0">-- none --</option>
+    </select>
+    <button id="btnHelpHighlight" onclick="showHelp(this);">?</button>
+    <div id="divHelpHighlight" class="help" style="display: none;">
+      <button id="btxHelpHighlight" style="float: right;" onclick="showHelp(this);">X</button>
+      Select a row from the the dropdown to highlight that row in the chart.
+    </div>
     <br />
     <a id="tabChartSettings" class="tabTitle tabSelected" onclick="switchTab('ChartSettings');">chart settings</a>
     <a id="tabImportImage" class="tabTitle" onclick="switchTab('ImportImage');">import image</a>
