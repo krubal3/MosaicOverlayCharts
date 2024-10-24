@@ -32,10 +32,11 @@ var selection = {
 // symbols used in the pattern
 var plain = "";
 var overlay = "X";
+var slip = "V";
 var increase = "+";
 var decrease = "-";
 
-var tabs = ["ChartSettings", "ImportImage", "ImportText", "ImportFont"]
+var tabs = ["ChartSettings", "ImportImage", "ImportText", "ImportFont", "SlipStitch"]
 
 // -- global functions 
 
@@ -121,7 +122,71 @@ function getIdRange(fromId, toId) {
   }
 }
 
+function convertToSlipStitch() {
+  for (r = 1; r <= pattern.gridRows; r++) {
+    for (c = 3; c < pattern.gridColumns; c++) {
+      let prevCell2 = getCell(r, c - 2);
+      let prevCell = getCell(r, c - 1);
+      let thisCell = getCell(r, c);
+      let nextCell = getCell(r, c + 1);
+      if (r % 2 == 0) {
+        if (prevCell2.style.backgroundColor == colorA && prevCell.style.backgroundColor == colorA && thisCell.style.backgroundColor == colorA && nextCell.style.backgroundColor == colorA) {
+          if (c % 2 == 0) {
+            prevCell.style.backgroundColor = colorB;
+          }
+          else {
+            thisCell.style.backgroundColor = colorB;
+          }
+        }
+      }
+      else {
+        if (prevCell2.style.backgroundColor == colorB && prevCell.style.backgroundColor == colorB && thisCell.style.backgroundColor == colorB && nextCell.style.backgroundColor == colorB) {
+          if (c % 2 == 0) {
+            thisCell.style.backgroundColor = colorA;
+          }
+          else {
+            prevCell.style.backgroundColor = colorA;
+          }
+        }
+      }
+    }
+  }
+  for (r = 1; r <= pattern.gridRows; r++) {
+    for (c = 3; c < pattern.gridColumns; c++) { 
+      let prevCell = getCell(r, c - 1);
+      let thisCell = getCell(r, c);
+      let nextCell = getCell(r, c + 1);
+      if (r % 2 == 0) {
+        if (prevCell.style.backgroundColor == colorA && thisCell.style.backgroundColor == colorA && nextCell.style.backgroundColor == colorA) {
+          thisCell.style.backgroundColor = colorB;
+        }
+      }
+      else {
+        if (prevCell.style.backgroundColor == colorB && thisCell.style.backgroundColor == colorB && nextCell.style.backgroundColor == colorB) {
+          thisCell.style.backgroundColor = colorA;
+        }
+      }
+    }
+  }
+  savePattern();
+}
+
 function switchTab(id){
+  let btnImportInstructions = document.getElementById("btnImportInstructions");
+  btnImportInstructions.disabled = false;
+  if (id == "SlipStitch") {
+    if (!confirm("Converting to slip stitch may change the design.  If you have not already saved a copy of the current design, click Cancel on this message and save the design before continuing.  If you have already saved the design, click OK to continue.")) {
+      return;
+    }
+    else {
+      changeEdgeStitches(true);
+      document.getElementById("chkEdgeStitches").checked = true;
+      btnImportInstructions.disabled = true;
+      document.getElementById("selMode").value = "T";
+      changeMode();
+      convertToSlipStitch();
+    }
+  }
   for (t = 0; t < tabs.length; t++) {
     let div = document.getElementById("div" + tabs[t]);
     div.style.display = "none";
@@ -134,6 +199,11 @@ function switchTab(id){
       anchor.classList.add("tabSelected");
     }
   }
+
+  restorePattern();
+  loadChart();
+  refreshPreview();
+  writeInstructions();
 
 }
 
@@ -665,6 +735,29 @@ function addXs() {
           if (color == colorA && colorBelow == colorA) {
             td.innerHTML = overlay;
           }
+        }
+      }
+    }
+  }
+  if (document.getElementById("divSlipStitch").style.display == "") {
+    addVs();
+  }
+}
+
+function addVs() {
+  for (r = pattern.gridRows; r > 1; r--) {
+    for (c = pattern.gridColumns; c >= 1; c--) {
+      let td = getCell(r, c);
+      td.innerHTML = plain;
+      let color = td.style.backgroundColor;
+      if (r % 2 == 0) {
+        if (color == colorA) {
+          td.innerHTML = slip;
+        }
+      }
+      else {
+        if (color == colorB) {
+          td.innerHTML = slip;
         }
       }
     }
@@ -1655,6 +1748,9 @@ function writeInstructions() {
       let currColor = td.style.backgroundColor;
       if (td.innerHTML == overlay) {
         txt = overlay;
+      }
+      if (td.innerHTML == slip) {
+        txt = slip;
       }
       if (r > 1) {
         let tdBelow = getCell(r - 1, c);
