@@ -173,7 +173,7 @@ function convertToSlipStitch() {
 
 function switchTab(id){
   let btnImportInstructions = document.getElementById("btnImportInstructions");
-  btnImportInstructions.disabled = false;
+  
   if (id == "SlipStitch") {
     if (!confirm("Converting to slip stitch may change the design.  If you have not already saved a copy of the current design, click Cancel on this message and save the design before continuing.  If you have already saved the design, click OK to continue.")) {
       return;
@@ -181,7 +181,6 @@ function switchTab(id){
     else {
       changeEdgeStitches(true);
       document.getElementById("chkEdgeStitches").checked = true;
-      btnImportInstructions.disabled = true;
       document.getElementById("selMode").value = "T";
       changeMode();
       convertToSlipStitch();
@@ -1507,6 +1506,9 @@ function splitStitchText(stitchText) {
     case overlay:
       stitchInstructions.stitchType = overlay;
       break;
+    case slip:
+        stitchInstructions.stitchType = slip;
+        break;
     case increase:
       stitchInstructions.stitchType = increase;
       break;
@@ -1618,6 +1620,13 @@ function workRows(arrRow, arrRowStarts, arrGrid) {
             cellBelow = arrGrid.find((cell) => cell.row == r - 1 && cell.column == currColumn + i);
             if (cellBelow !== undefined && cellBelow.color !== colorNoStitch) {
               cellBelow.color = rowColor;
+            }
+          }
+          if (stitchInstructions.stitchType == slip) {
+            let currCell = arrGrid.find((cell) => cell.row == r && cell.column == currColumn + i);
+            currCell.color = colorA;
+            if (rowColor == colorA) {
+              currCell.color = colorB;
             }
           }
         }
